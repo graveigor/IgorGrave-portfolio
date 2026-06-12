@@ -1,28 +1,34 @@
-# Hi there! 👋 I'm Igor Grave Teixeira
+# Igor Grave Teixeira — Portfolio
 
-**Fullstack & Backend Developer | Software Engineering Student @ FIAP**
+**🌐 Live:** [igor-grave-portfolio.vercel.app](https://igor-grave-portfolio.vercel.app/)
 
-I am a 19-year-old developer based in São Paulo, Brazil, passionate about building robust, scalable, and clean architectures. I focus on creating end-to-end applications, bridging the gap between seamless user interfaces and highly secure server-side logic. 
+Personal portfolio of **Igor Grave Teixeira** — Fullstack / Backend Developer, Software Engineering student at FIAP, São Paulo, Brazil.
 
-I strongly believe that good code is more than just functioning software—it must be readable, testable, and ready to scale.
+Built from scratch with **pure HTML, CSS and JavaScript** in a single file. No frameworks, no build step, no dependencies.
 
-## 🛠️ Tech Stack
+## ✨ Features
 
-* **Backend:** Java, Node.js, Spring Boot, Python, REST APIs, Express.js
-* **Frontend:** React, TypeScript, JavaScript, HTML5 / CSS3, Next.js
-* **Databases:** PostgreSQL, MySQL, MongoDB
-* **DevOps & Tools:** Git, GitHub, Docker, Linux, CI/CD, AWS (Basics)
+* **Bilingual (PT/EN)** — auto-detects browser language, remembers your choice, switches instantly without reloading
+* **Neo-brutalist editorial design** — Bebas Neue / DM Mono / Fraunces, hard borders, raw grids
+* **Real projects, live deploys** — every featured project links to public code and a working deployment, including websites delivered to real clients
+* **SEO-ready** — Open Graph, Twitter cards and JSON-LD structured data for rich link previews
+* **Accessible** — skip link, visible focus states, `prefers-reduced-motion` support, semantic HTML
+* **Zero tooling** — one HTML file; clone and open in a browser, that's it
 
-## 🚀 Highlighted Projects
+## 🚀 Run locally
 
-* [**Verve Network**](https://github.com/Verve-Network): An organization focused on developing complete and scalable solutions through open-source collaboration.
-* [**Java Banking Challenge**](https://github.com/graveigor/DesafioBancarioJava): A robust banking management system built with Java, focusing on strict business rules, OOP, and solid architecture.
-* [**CP4 Front-End**](https://github.com/graveigor/CP4_FrontEnd): A dynamic and responsive UI/UX project developed as part of my practical curriculum at FIAP.
+```bash
+git clone https://github.com/graveigor/IgorGrave-portfolio.git
+cd IgorGrave-portfolio
+# open index.html in your browser — done
+```
 
-## 📫 Let's Connect
+## 📫 Contact
 
-I am currently open to new opportunities, internships, and networking. Let's build something great together!
-
-* **LinkedIn:** https://www.linkedin.com/in/igorgrave
 * **Email:** igorgraveteixeira@gmail.com
-* **Portfolio:** https://igor-grave-portfolio-2.vercel.app/#
+* **GitHub:** [@graveigor](https://github.com/graveigor)
+* **LinkedIn:** [linkedin.com/in/igorgrave](https://www.linkedin.com/in/igorgrave)
+
+## 📄 License
+
+[MIT](LICENSE)

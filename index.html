@@ -4,7 +4,56 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Igor Grave Teixeira</title>
+    <title>Igor Grave Teixeira — Desenvolvedor Fullstack · São Paulo</title>
+
+    <!-- ── SEO ── -->
+    <meta name="description"
+        content="Desenvolvedor fullstack em São Paulo. Engenharia de Software na FIAP. Sites de clientes reais em produção, Java, JavaScript e APIs. Disponível para estágio e vagas júnior." />
+    <meta name="author" content="Igor Grave Teixeira" />
+    <link rel="canonical" href="https://igor-grave-portfolio.vercel.app/" />
+    <meta name="theme-color" content="#0a0a0a" />
+
+    <!-- ── OPEN GRAPH / COMPARTILHAMENTO ── -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Igor Grave Teixeira — Desenvolvedor Fullstack" />
+    <meta property="og:description"
+        content="Sites de clientes reais em produção, Java, JavaScript e APIs. Eng. de Software na FIAP · São Paulo." />
+    <meta property="og:url" content="https://igor-grave-portfolio.vercel.app/" />
+    <meta property="og:image" content="https://avatars.githubusercontent.com/u/227787398?v=4" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Igor Grave Teixeira — Desenvolvedor Fullstack" />
+    <meta name="twitter:description"
+        content="Sites de clientes reais em produção, Java, JavaScript e APIs. Eng. de Software na FIAP · São Paulo." />
+    <meta name="twitter:image" content="https://avatars.githubusercontent.com/u/227787398?v=4" />
+
+    <!-- ── FAVICON (SVG INLINE) ── -->
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230a0a0a'/%3E%3Ctext x='32' y='44' font-family='Arial Black,sans-serif' font-size='30' font-weight='900' fill='%23ff3d00' text-anchor='middle'%3EIG%3C/text%3E%3C/svg%3E" />
+
+    <!-- ── DADOS ESTRUTURADOS (GOOGLE) ── -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Igor Grave Teixeira",
+        "jobTitle": "Fullstack Developer",
+        "url": "https://igor-grave-portfolio.vercel.app/",
+        "email": "mailto:igorgraveteixeira@gmail.com",
+        "sameAs": [
+            "https://github.com/graveigor",
+            "https://www.linkedin.com/in/igorgrave"
+        ],
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "São Paulo",
+            "addressCountry": "BR"
+        },
+        "alumniOf": {
+            "@type": "CollegeOrUniversity",
+            "name": "FIAP"
+        }
+    }
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
@@ -21,6 +70,7 @@
             --accent: #ff3d00;
             --accent2: #ffd600;
             --blue: #0033ff;
+            --green: #00a34a;
         }
 
         /* ── RESET BÁSICO ── */
@@ -43,6 +93,36 @@
             font-weight: 300;
             overflow-x: hidden;
             cursor: crosshair;
+        }
+
+        ::selection {
+            background: var(--accent);
+            color: var(--paper);
+        }
+
+        a:focus-visible,
+        button:focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 3px;
+        }
+
+        /* ── LINK PULAR PARA CONTEÚDO (A11Y) ── */
+        .skip-link {
+            position: absolute;
+            left: -999px;
+            top: 0;
+            z-index: 999;
+            background: var(--ink);
+            color: var(--paper);
+            padding: 0.8rem 1.4rem;
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        .skip-link:focus {
+            left: 0;
         }
 
         /* ── FAIXA EM MOVIMENTO (MARQUEE) ── */
@@ -241,7 +321,7 @@
             font-size: 1.05rem;
             line-height: 1.75;
             color: var(--ink);
-            max-width: 320px;
+            max-width: 340px;
             opacity: 0.7;
         }
 
@@ -537,6 +617,32 @@
             opacity: 0.85;
         }
 
+        /* ── FAIXA "NO RADAR" (SKILLS EM ESTUDO) ── */
+        .skills-radar {
+            border-top: 2px solid rgba(255, 255, 255, 0.12);
+            padding: 1.4rem 3rem;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem 1.4rem;
+        }
+
+        .radar-label {
+            font-size: 0.62rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent2);
+            opacity: 0.9;
+        }
+
+        .radar-item {
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 0.3rem 0.8rem;
+            opacity: 0.6;
+        }
+
         /* ── SEÇÃO PROJETOS ── */
         #projects {
             border-bottom: 2px solid var(--ink);
@@ -558,6 +664,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 1.5rem;
         }
 
         .projects-title {
@@ -567,12 +674,13 @@
             line-height: 1;
         }
 
-        .projects-count {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 5rem;
-            color: transparent;
-            -webkit-text-stroke: 1.5px var(--mid);
-            line-height: 1;
+        .projects-sub {
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            font-size: 0.95rem;
+            opacity: 0.55;
+            max-width: 320px;
+            text-align: right;
         }
 
         .project-row {
@@ -581,12 +689,6 @@
             border-bottom: 2px solid var(--ink);
             min-height: 100px;
             transition: background 0.2s;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .project-row:last-child {
-            border-bottom: none;
         }
 
         .project-row:hover {
@@ -611,6 +713,13 @@
             gap: 0.6rem;
         }
 
+        .project-name-row {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            flex-wrap: wrap;
+        }
+
         .project-name {
             font-family: 'Bebas Neue', sans-serif;
             font-size: 2rem;
@@ -623,11 +732,45 @@
             color: var(--accent);
         }
 
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.6rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            border: 1.5px solid var(--green);
+            color: var(--green);
+            padding: 0.25rem 0.6rem;
+            white-space: nowrap;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse-dot 1.6s ease-in-out infinite;
+        }
+
+        .client-badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.6rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            background: var(--ink);
+            color: var(--accent2);
+            padding: 0.32rem 0.6rem;
+            white-space: nowrap;
+        }
+
         .project-desc {
             font-size: 0.78rem;
             opacity: 0.5;
             line-height: 1.6;
-            max-width: 520px;
+            max-width: 560px;
         }
 
         .project-tags {
@@ -653,18 +796,136 @@
             color: var(--accent);
         }
 
-        .project-arrow {
-            padding: 2rem 2rem 2rem 1rem;
+        .project-actions {
             display: flex;
-            align-items: center;
-            font-size: 1.8rem;
-            opacity: 0.15;
-            transition: opacity 0.2s, transform 0.2s;
+            flex-direction: column;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 2rem 2.5rem 2rem 1rem;
         }
 
-        .project-row:hover .project-arrow {
-            opacity: 0.7;
-            transform: translate(4px, -4px);
+        .project-link {
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--ink);
+            border: 1.5px solid var(--ink);
+            padding: 0.55rem 1.1rem;
+            text-align: center;
+            white-space: nowrap;
+            transition: background 0.15s, color 0.15s, transform 0.15s, box-shadow 0.15s;
+        }
+
+        .project-link:hover {
+            background: var(--ink);
+            color: var(--paper);
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0 var(--accent);
+        }
+
+        .project-link.primary {
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        .project-link.primary:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* ── ARQUIVO DE PROJETOS (MAIS NO GITHUB) ── */
+        .archive-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1.6rem 3rem;
+            border-bottom: 2px solid var(--ink);
+            background: var(--faint);
+        }
+
+        .archive-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: 0.08em;
+        }
+
+        .archive-gh-link {
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--ink);
+            text-decoration: none;
+            border-bottom: 1.5px solid var(--accent);
+            padding-bottom: 2px;
+            transition: color 0.15s;
+        }
+
+        .archive-gh-link:hover {
+            color: var(--accent);
+        }
+
+        .archive-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .archive-card {
+            border-right: 2px solid var(--ink);
+            border-bottom: 2px solid var(--ink);
+            padding: 1.6rem 1.8rem;
+            text-decoration: none;
+            color: var(--ink);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: background 0.18s;
+            position: relative;
+        }
+
+        .archive-grid .archive-card:nth-child(3n) {
+            border-right: none;
+        }
+
+        .archive-grid .archive-card:nth-last-child(-n+3) {
+            border-bottom: none;
+        }
+
+        .archive-card:hover {
+            background: var(--faint);
+        }
+
+        .archive-card-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.25rem;
+            letter-spacing: 0.04em;
+            transition: color 0.15s;
+        }
+
+        .archive-card:hover .archive-card-name {
+            color: var(--accent);
+        }
+
+        .archive-card-meta {
+            font-size: 0.65rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            opacity: 0.4;
+        }
+
+        .archive-card-arrow {
+            position: absolute;
+            top: 1.2rem;
+            right: 1.4rem;
+            font-size: 1rem;
+            opacity: 0.2;
+            transition: opacity 0.18s, transform 0.18s;
+        }
+
+        .archive-card:hover .archive-card-arrow {
+            opacity: 0.8;
+            transform: translate(3px, -3px);
         }
 
         /* ── SEÇÃO CONTATO ── */
@@ -776,6 +1037,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
             padding: 1.5rem 2.5rem;
             font-size: 0.68rem;
             letter-spacing: 0.12em;
@@ -785,6 +1048,10 @@
         footer a {
             color: var(--accent2);
             text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
         }
 
         /* ── ANIMAÇÃO DE REVELAÇÃO (JS) ── */
@@ -806,6 +1073,25 @@
 
         .lang-switching [data-i18n] {
             opacity: 0;
+        }
+
+        /* ── ACESSIBILIDADE: MOVIMENTO REDUZIDO ── */
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            .marquee-track,
+            .hero-tag-dot,
+            .status-badge::before {
+                animation: none;
+            }
+
+            .reveal {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
         }
 
         /* ── RESPONSIVIDADE ── */
@@ -887,6 +1173,10 @@
                 border-bottom: 2px solid rgba(255, 255, 255, 0.12);
             }
 
+            .skills-radar {
+                padding: 1.4rem 1.5rem;
+            }
+
             .projects-header {
                 grid-template-columns: 1fr;
             }
@@ -897,17 +1187,54 @@
                 padding: 1.5rem;
             }
 
+            .projects-header-right {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.8rem;
+            }
+
+            .projects-sub {
+                text-align: left;
+            }
+
             .project-row {
-                grid-template-columns: 60px 1fr auto;
+                grid-template-columns: 60px 1fr;
             }
 
             .project-index {
                 padding: 1.2rem;
                 font-size: 1.5rem;
+                align-items: flex-start;
             }
 
             .project-body {
-                padding: 1.5rem 1rem;
+                padding: 1.5rem 1.5rem 0.5rem 1rem;
+            }
+
+            .project-actions {
+                grid-column: 2;
+                flex-direction: row;
+                padding: 0 1.5rem 1.5rem 1rem;
+            }
+
+            .archive-header {
+                padding: 1.4rem 1.5rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.6rem;
+            }
+
+            .archive-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .archive-grid .archive-card {
+                border-right: none;
+                border-bottom: 2px solid var(--ink);
+            }
+
+            .archive-grid .archive-card:last-child {
+                border-bottom: none;
             }
 
             .contact-left {
@@ -937,8 +1264,15 @@
             .nav-right a {
                 display: none;
             }
-            .nav-right a:last-of-type {
-                display: none;
+
+            .hero-bottom {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+
+            .project-actions {
+                flex-wrap: wrap;
             }
         }
     </style>
@@ -946,21 +1280,23 @@
 
 <body>
 
-    <div class="marquee-strip">
+    <a class="skip-link" href="#projects" data-i18n="a11y.skip">Pular para os projetos</a>
+
+    <div class="marquee-strip" aria-hidden="true">
         <div class="marquee-track">
             IGOR GRAVE TEIXEIRA <span class="marquee-dot"></span>
-            ENGENHARIA DE SOFTWARE <span class="marquee-dot"></span>
             FULLSTACK DEVELOPER <span class="marquee-dot"></span>
-            BACKEND DEVELOPER <span class="marquee-dot"></span>
+            ENGENHARIA DE SOFTWARE <span class="marquee-dot"></span>
+            SITES EM PRODUÇÃO <span class="marquee-dot"></span>
             IGOR GRAVE TEIXEIRA <span class="marquee-dot"></span>
-            ENGENHARIA DE SOFTWARE <span class="marquee-dot"></span>
             FULLSTACK DEVELOPER <span class="marquee-dot"></span>
-            BACKEND DEVELOPER <span class="marquee-dot"></span>
+            ENGENHARIA DE SOFTWARE <span class="marquee-dot"></span>
+            SITES EM PRODUÇÃO <span class="marquee-dot"></span>
         </div>
     </div>
 
     <nav>
-        <div class="nav-left" data-i18n="nav.location">São Paulo, BR · 2025</div>
+        <div class="nav-left" data-i18n="nav.location">São Paulo, BR · 2026</div>
         <div class="nav-logo">IGT</div>
         <div class="nav-right">
             <a href="#about"    data-i18n="nav.about">Sobre</a>
@@ -968,7 +1304,7 @@
             <a href="#projects" data-i18n="nav.projects">Projetos</a>
             <a href="#contact"  data-i18n="nav.contact">Contato</a>
             <!-- BOTÃO DE IDIOMA -->
-            <div class="lang-toggle" id="langToggle" role="group" aria-label="Selecionar idioma">
+            <div class="lang-toggle" id="langToggle" role="group" aria-label="Selecionar idioma / Select language">
                 <button class="lang-opt active" data-lang="pt" onclick="setLang('pt')">PT</button>
                 <div class="lang-divider"></div>
                 <button class="lang-opt"        data-lang="en" onclick="setLang('en')">EN</button>
@@ -990,12 +1326,12 @@
                 </h1>
             </div>
             <div class="hero-bottom">
-                <p class="hero-desc" data-i18n="hero.desc">Desenvolvedor focado em construir sistemas sólidos, escaláveis e bem arquitetados.</p>
+                <p class="hero-desc" data-i18n="hero.desc">Desenvolvedor fullstack que tira projeto do papel: sites de clientes reais em produção, backend em Java e Node, e obsessão por código limpo.</p>
                 <a href="#projects" class="btn-hero" data-i18n="hero.cta">Ver projetos ↗</a>
             </div>
         </div>
         <div class="hero-right">
-            <div class="hero-big-num">19</div>
+            <div class="hero-big-num">26</div>
             <div class="hero-info-box">
                 <div class="info-row">
                     <span class="info-label" data-i18n="hero.info.roleLabel">Função</span>
@@ -1014,7 +1350,7 @@
                     <span class="info-value"  data-i18n="hero.info.focusValue">APIs · Arquitetura · Cloud</span>
                 </div>
             </div>
-            <div class="hero-accent-block" data-i18n="hero.available">Disponível para contratação</div>
+            <div class="hero-accent-block" data-i18n="hero.available">2 sites de clientes no ar</div>
         </div>
     </section>
 
@@ -1024,20 +1360,13 @@
             <div class="section-tag" data-i18n="about.sideTag">Sobre mim</div>
         </div>
         <div class="about-body">
-            <h2 class="about-title reveal" data-i18n="about.title">Código <em>preciso,</em><br>arquitetura<br>que dura.</h2>
+            <h2 class="about-title reveal" data-i18n="about.title">Menos promessa,<br><em>mais produção.</em></h2>
             <div class="about-cols">
                 <div class="about-text reveal">
-                    <p data-i18n="about.p1">Olá! Sou Igor Grave Teixeira, 19 anos, estudante de Engenharia de Software na FIAP em São Paulo.
-                        Sou apaixonado pelo desenvolvimento Fullstack / Backend, construindo aplicações de ponta a
-                        ponta: desde a experiência visual até a arquitetura robusta dos servidores.</p>
-                    <p data-i18n="about.p2">Acredito que bom código é mais que funcionar: é ser legível, testável e pronto para crescer.
-                        Estou sempre aprendendo, construindo e buscando minha primeira grande oportunidade no mercado.</p>
+                    <p data-i18n="about.p1">Sou Igor Grave Teixeira, estudante de Engenharia de Software na FIAP e desenvolvedor fullstack em São Paulo. Enquanto curso a graduação, já entrego software de verdade: sites institucionais para clientes reais rodando em produção, sistemas em Java e interfaces que funcionam em qualquer tela.</p>
+                    <p data-i18n="about.p2">Acredito que bom código é legível, testável e pronto para crescer — e que a melhor forma de aprender é colocando coisas no ar. Tudo que está aqui é público: código aberto, histórico de commits e deploy funcionando. Pode conferir.</p>
                 </div>
                 <div class="about-facts reveal">
-                    <div class="fact">
-                        <span class="fact-label" data-i18n="about.fact.ageLabel">Idade</span>
-                        <span class="fact-value accent">19</span>
-                    </div>
                     <div class="fact">
                         <span class="fact-label" data-i18n="about.fact.uniLabel">Universidade</span>
                         <span class="fact-value">FIAP</span>
@@ -1047,8 +1376,12 @@
                         <span class="fact-value" data-i18n="about.fact.courseValue">Eng. Software</span>
                     </div>
                     <div class="fact">
-                        <span class="fact-label" data-i18n="about.fact.focusLabel">Foco</span>
-                        <span class="fact-value accent">Full + Back</span>
+                        <span class="fact-label" data-i18n="about.fact.gradLabel">Formação prevista</span>
+                        <span class="fact-value">2029</span>
+                    </div>
+                    <div class="fact">
+                        <span class="fact-label" data-i18n="about.fact.liveLabel">Projetos no ar</span>
+                        <span class="fact-value accent">6</span>
                     </div>
                     <div class="fact">
                         <span class="fact-label" data-i18n="about.fact.statusLabel">Status</span>
@@ -1073,33 +1406,41 @@
                 <div class="skill-col-icon">⚙️</div>
                 <div class="skill-col-name" data-i18n="skills.backend">Backend</div>
                 <ul class="skill-list">
-                    <li>Node.js</li><li>Java</li><li>Spring Boot</li>
-                    <li>Python</li><li>REST APIs</li><li>Express.js</li>
+                    <li>Java</li><li>Node.js</li><li>Express.js</li>
+                    <li>REST APIs</li><li>Python</li>
                 </ul>
             </div>
             <div class="skill-col reveal">
                 <div class="skill-col-icon">🖥️</div>
                 <div class="skill-col-name" data-i18n="skills.frontend">Frontend</div>
                 <ul class="skill-list">
-                    <li>React</li><li>TypeScript</li><li>JavaScript</li>
-                    <li>HTML5 / CSS3</li><li>Next.js</li>
+                    <li>JavaScript</li><li>HTML5 / CSS3</li><li>Tailwind CSS</li>
+                    <li>TypeScript</li><li data-i18n="skills.responsive">Design responsivo</li>
                 </ul>
             </div>
             <div class="skill-col reveal">
                 <div class="skill-col-icon">🗄️</div>
                 <div class="skill-col-name" data-i18n="skills.database">Banco de Dados</div>
                 <ul class="skill-list">
-                    <li>PostgreSQL</li><li>MySQL</li><li>MongoDB</li>
+                    <li>SQL</li><li>MySQL</li><li>PostgreSQL</li><li>MongoDB</li>
                 </ul>
             </div>
             <div class="skill-col reveal">
                 <div class="skill-col-icon">🛠️</div>
-                <div class="skill-col-name">DevOps</div>
+                <div class="skill-col-name" data-i18n="skills.tools">Ferramentas</div>
                 <ul class="skill-list">
-                    <li>Git &amp; GitHub</li><li>Docker</li><li>Linux</li>
-                    <li>CI/CD</li><li data-i18n="skills.aws">AWS (básico)</li>
+                    <li>Git &amp; GitHub</li><li data-i18n="skills.vercel">Vercel (deploy)</li>
+                    <li>Linux</li><li data-i18n="skills.docker">Docker (básico)</li>
                 </ul>
             </div>
+        </div>
+        <div class="skills-radar reveal">
+            <span class="radar-label" data-i18n="skills.radarLabel">No radar agora →</span>
+            <span class="radar-item">Spring Boot</span>
+            <span class="radar-item">React</span>
+            <span class="radar-item">Next.js</span>
+            <span class="radar-item">CI/CD</span>
+            <span class="radar-item">AWS</span>
         </div>
     </section>
 
@@ -1110,46 +1451,85 @@
             </div>
             <div class="projects-header-right">
                 <h2 class="projects-title reveal" data-i18n="projects.title">Projetos.</h2>
+                <p class="projects-sub reveal" data-i18n="projects.sub">Não é mockup nem tutorial: é código público com deploy rodando agora.</p>
             </div>
         </div>
 
-        <a href="https://github.com/Verve-Network" target="_blank" class="project-row reveal">
+        <!-- 01 — COTSEGURO (CLIENTE REAL) -->
+        <div class="project-row reveal">
             <div class="project-index">01</div>
             <div class="project-body">
-                <div class="project-name">Verve Network</div>
-                <div class="project-desc" data-i18n="projects.verve.desc">Organização focada no desenvolvimento de soluções completas e escaláveis.
-                    Repositório central com diversos projetos e colaborações em equipa.</div>
+                <div class="project-name-row">
+                    <h3 class="project-name">Cotseguro — Seguros de Transporte</h3>
+                    <span class="client-badge" data-i18n="projects.clientBadge">Cliente real</span>
+                    <span class="status-badge" data-i18n="projects.liveBadge">No ar</span>
+                </div>
+                <p class="project-desc" data-i18n="projects.cotseguro.desc">Site institucional completo para corretora de seguros de transporte: 4 páginas, formulário de cotação, menu mobile e animações. Entregue, publicado e em uso pelo cliente.</p>
                 <div class="project-tags">
-                    <span class="project-tag" data-i18n="projects.verve.tag1">Open Source</span>
-                    <span class="project-tag">Fullstack</span>
-                    <span class="project-tag" data-i18n="projects.verve.tag3">Colaboração</span>
+                    <span class="project-tag">HTML5</span>
+                    <span class="project-tag">Tailwind CSS</span>
+                    <span class="project-tag">JavaScript</span>
+                    <span class="project-tag">Vercel</span>
                 </div>
             </div>
-            <div class="project-arrow">↗</div>
-        </a>
+            <div class="project-actions">
+                <a class="project-link primary" href="https://cotseguro-site.vercel.app" target="_blank" rel="noopener" data-i18n="projects.viewSite">Ver site ↗</a>
+                <a class="project-link" href="https://github.com/graveigor/cotseguro-site" target="_blank" rel="noopener" data-i18n="projects.viewCode">Código ↗</a>
+            </div>
+        </div>
 
-        <a href="https://github.com/graveigor/DesafioBancarioJava" target="_blank" class="project-row reveal">
+        <!-- 02 — VET THATA (CLIENTE REAL) -->
+        <div class="project-row reveal">
             <div class="project-index">02</div>
             <div class="project-body">
-                <div class="project-name" data-i18n="projects.bank.name">Desafio Bancário Java</div>
-                <div class="project-desc" data-i18n="projects.bank.desc">Sistema de gestão bancária desenvolvido em Java. Implementação rigorosa de
-                    regras de negócio, Programação Orientada a Objetos e arquitetura sólida.</div>
+                <div class="project-name-row">
+                    <h3 class="project-name">Vet Thata — Clínica Veterinária</h3>
+                    <span class="client-badge" data-i18n="projects.clientBadge">Cliente real</span>
+                    <span class="status-badge" data-i18n="projects.liveBadge">No ar</span>
+                </div>
+                <p class="project-desc" data-i18n="projects.vet.desc">Site de 6 páginas para médica-veterinária: serviços, vitrine de produtos e agendamento integrado com WhatsApp e Google Agenda. Configuração centralizada em JS para o cliente atualizar tudo num lugar só.</p>
+                <div class="project-tags">
+                    <span class="project-tag">HTML5</span>
+                    <span class="project-tag">Tailwind CSS</span>
+                    <span class="project-tag">JavaScript</span>
+                    <span class="project-tag" data-i18n="projects.vet.tagIntegration">Integração WhatsApp</span>
+                </div>
+            </div>
+            <div class="project-actions">
+                <a class="project-link primary" href="https://vet-thabata-site.vercel.app" target="_blank" rel="noopener" data-i18n="projects.viewSite">Ver site ↗</a>
+                <a class="project-link" href="https://github.com/graveigor/vet_thabata_site" target="_blank" rel="noopener" data-i18n="projects.viewCode">Código ↗</a>
+            </div>
+        </div>
+
+        <!-- 03 — SISTEMA BANCÁRIO JAVA -->
+        <div class="project-row reveal">
+            <div class="project-index">03</div>
+            <div class="project-body">
+                <div class="project-name-row">
+                    <h3 class="project-name" data-i18n="projects.bank.name">Sistema Bancário em Java</h3>
+                </div>
+                <p class="project-desc" data-i18n="projects.bank.desc">Sistema de conta bancária via console: saldo, depósitos, transferências e validação de regras de negócio. Foco em lógica, fluxos de controle e organização de código em Java.</p>
                 <div class="project-tags">
                     <span class="project-tag">Java</span>
                     <span class="project-tag">POO</span>
                     <span class="project-tag">Backend</span>
-                    <span class="project-tag" data-i18n="projects.bank.tag4">Arquitetura</span>
+                    <span class="project-tag" data-i18n="projects.bank.tagLogic">Regras de negócio</span>
                 </div>
             </div>
-            <div class="project-arrow">↗</div>
-        </a>
+            <div class="project-actions">
+                <a class="project-link primary" href="https://github.com/graveigor/DesafioBancarioJava" target="_blank" rel="noopener" data-i18n="projects.viewCode">Código ↗</a>
+            </div>
+        </div>
 
-        <a href="https://cp-4-front-end-inky.vercel.app" target="_blank" class="project-row reveal">
-            <div class="project-index">03</div>
+        <!-- 04 — CP4 FRONT-END FIAP -->
+        <div class="project-row reveal">
+            <div class="project-index">04</div>
             <div class="project-body">
-                <div class="project-name">CP4 Front-End</div>
-                <div class="project-desc" data-i18n="projects.cp4.desc">Projeto Front-End dinâmico e responsivo desenvolvido como parte do currículo
-                    prático da FIAP, focando em UI/UX e integração de interfaces.</div>
+                <div class="project-name-row">
+                    <h3 class="project-name">CP4 Front-End — FIAP</h3>
+                    <span class="status-badge" data-i18n="projects.liveBadge">No ar</span>
+                </div>
+                <p class="project-desc" data-i18n="projects.cp4.desc">Projeto front-end dinâmico e responsivo do currículo prático da FIAP, com foco em UI/UX, manipulação de DOM e integração de interfaces.</p>
                 <div class="project-tags">
                     <span class="project-tag">HTML5</span>
                     <span class="project-tag">CSS3</span>
@@ -1157,15 +1537,56 @@
                     <span class="project-tag">UI/UX</span>
                 </div>
             </div>
-            <div class="project-arrow">↗</div>
-        </a>
+            <div class="project-actions">
+                <a class="project-link primary" href="https://cp-4-front-end-inky.vercel.app" target="_blank" rel="noopener" data-i18n="projects.viewSite">Ver site ↗</a>
+                <a class="project-link" href="https://github.com/graveigor/CP4_FrontEnd" target="_blank" rel="noopener" data-i18n="projects.viewCode">Código ↗</a>
+            </div>
+        </div>
+
+        <!-- ARQUIVO: MAIS PROJETOS -->
+        <div class="archive-header reveal">
+            <span class="archive-title" data-i18n="projects.archiveTitle">+ Mais projetos no GitHub</span>
+            <a class="archive-gh-link" href="https://github.com/graveigor?tab=repositories" target="_blank" rel="noopener" data-i18n="projects.archiveLink">Ver todos os repositórios ↗</a>
+        </div>
+        <div class="archive-grid">
+            <a class="archive-card reveal" href="https://github.com/graveigor/Cp5_Front-End" target="_blank" rel="noopener">
+                <span class="archive-card-name">CP5 Front-End</span>
+                <span class="archive-card-meta">HTML · CSS · JS</span>
+                <span class="archive-card-arrow" aria-hidden="true">↗</span>
+            </a>
+            <a class="archive-card reveal" href="https://github.com/graveigor/gs-frontend-webdev" target="_blank" rel="noopener">
+                <span class="archive-card-name">Global Solution — FIAP</span>
+                <span class="archive-card-meta" data-i18n="projects.archive.gsMeta">Front-end · Em dupla</span>
+                <span class="archive-card-arrow" aria-hidden="true">↗</span>
+            </a>
+            <a class="archive-card reveal" href="https://github.com/graveigor/Gabriella-portfolio" target="_blank" rel="noopener">
+                <span class="archive-card-name" data-i18n="projects.archive.gabiName">Portfolio para cliente</span>
+                <span class="archive-card-meta">HTML · CSS · JS</span>
+                <span class="archive-card-arrow" aria-hidden="true">↗</span>
+            </a>
+            <a class="archive-card reveal" href="https://github.com/graveigor/DesafioFilmeJava" target="_blank" rel="noopener">
+                <span class="archive-card-name" data-i18n="projects.archive.filmeName">Desafio Filme — Java</span>
+                <span class="archive-card-meta">Java · POO</span>
+                <span class="archive-card-arrow" aria-hidden="true">↗</span>
+            </a>
+            <a class="archive-card reveal" href="https://github.com/graveigor/rock_paper_scissors-Python" target="_blank" rel="noopener">
+                <span class="archive-card-name">Rock Paper Scissors</span>
+                <span class="archive-card-meta" data-i18n="projects.archive.rpsMeta">Python · Lógica</span>
+                <span class="archive-card-arrow" aria-hidden="true">↗</span>
+            </a>
+            <a class="archive-card reveal" href="https://github.com/graveigor/Jogo-do-n-mero-secreto" target="_blank" rel="noopener">
+                <span class="archive-card-name" data-i18n="projects.archive.jogoName">Jogo do Número Secreto</span>
+                <span class="archive-card-meta">JavaScript · DOM</span>
+                <span class="archive-card-arrow" aria-hidden="true">↗</span>
+            </a>
+        </div>
     </section>
 
     <section id="contact">
         <div class="contact-left">
-            <h2 class="contact-headline reveal" data-i18n="contact.headline">Vamos<br><span class="ghost">criar</span><br>juntos?</h2>
+            <h2 class="contact-headline reveal" data-i18n="contact.headline">Vamos<br><span class="ghost">construir</span><br>juntos?</h2>
             <p class="contact-sub reveal" data-i18n="contact.sub">
-                Estou disponível para estágios, contratações ou só uma boa conversa sobre tecnologia.
+                Estágio, vaga júnior ou freelance — me chama. Eu respondo rápido e chego com código pronto para mostrar.
             </p>
         </div>
         <div class="contact-right">
@@ -1174,28 +1595,28 @@
                     <span class="contact-link-type">E-mail</span>
                     <span class="contact-link-value">igorgraveteixeira@gmail.com</span>
                 </div>
-                <span class="contact-link-arrow">↗</span>
+                <span class="contact-link-arrow" aria-hidden="true">↗</span>
             </a>
-            <a href="https://github.com/graveigor" target="_blank" class="contact-link reveal">
+            <a href="https://github.com/graveigor" target="_blank" rel="noopener" class="contact-link reveal">
                 <div class="contact-link-inner">
                     <span class="contact-link-type">GitHub</span>
                     <span class="contact-link-value">github.com/graveigor</span>
                 </div>
-                <span class="contact-link-arrow">↗</span>
+                <span class="contact-link-arrow" aria-hidden="true">↗</span>
             </a>
-            <a href="https://www.linkedin.com/in/igorgrave" target="_blank" class="contact-link reveal">
+            <a href="https://www.linkedin.com/in/igorgrave" target="_blank" rel="noopener" class="contact-link reveal">
                 <div class="contact-link-inner">
                     <span class="contact-link-type">LinkedIn</span>
                     <span class="contact-link-value">linkedin.com/in/igorgrave</span>
                 </div>
-                <span class="contact-link-arrow">↗</span>
+                <span class="contact-link-arrow" aria-hidden="true">↗</span>
             </a>
         </div>
     </section>
 
     <footer>
-        <span data-i18n="footer.copy">© 2025 Igor Grave Teixeira</span>
-        <span data-i18n="footer.made">Feito com <a href="#">código</a> e café ☕</span>
+        <span data-i18n="footer.copy">© 2026 Igor Grave Teixeira</span>
+        <span data-i18n="footer.made">Feito do zero — HTML, CSS e JS puros, num único arquivo. <a href="https://github.com/graveigor/IgorGrave-portfolio" target="_blank" rel="noopener">Ver código ↗</a></span>
     </footer>
 
     <script>
@@ -1204,132 +1625,180 @@
         ──────────────────────────────────────────── */
         const TRANSLATIONS = {
             pt: {
-                'nav.location':             'São Paulo, BR · 2025',
-                'nav.about':                'Sobre',
-                'nav.skills':               'Skills',
-                'nav.projects':             'Projetos',
-                'nav.contact':              'Contato',
-                'hero.tag':                 'Aberto a oportunidades',
-                'hero.desc':                'Desenvolvedor focado em construir sistemas sólidos, escaláveis e bem arquitetados.',
-                'hero.cta':                 'Ver projetos ↗',
-                'hero.info.roleLabel':      'Função',
-                'hero.info.roleValue':      'Fullstack / Backend Dev',
-                'hero.info.degreeLabel':    'Graduação',
-                'hero.info.degreeValue':    'Eng. de Software · FIAP',
-                'hero.info.locationLabel':  'Localização',
-                'hero.info.locationValue':  'São Paulo, Brasil',
-                'hero.info.focusLabel':     'Foco atual',
-                'hero.info.focusValue':     'APIs · Arquitetura · Cloud',
-                'hero.available':           'Disponível para contratação',
-                'about.sideTag':            'Sobre mim',
-                'about.title':              'Código <em>preciso,</em><br>arquitetura<br>que dura.',
-                'about.p1':                 'Olá! Sou Igor Grave Teixeira, 19 anos, estudante de Engenharia de Software na FIAP em São Paulo. Sou apaixonado pelo desenvolvimento Fullstack / Backend, construindo aplicações de ponta a ponta: desde a experiência visual até a arquitetura robusta dos servidores.',
-                'about.p2':                 'Acredito que bom código é mais que funcionar: é ser legível, testável e pronto para crescer. Estou sempre aprendendo, construindo e buscando minha primeira grande oportunidade no mercado.',
-                'about.fact.ageLabel':      'Idade',
-                'about.fact.uniLabel':      'Universidade',
-                'about.fact.courseLabel':   'Curso',
-                'about.fact.courseValue':   'Eng. Software',
-                'about.fact.focusLabel':    'Foco',
-                'about.fact.statusLabel':   'Status',
-                'about.fact.statusValue':   'Disponível ✓',
-                'skills.title':             'Stack técnica.',
-                'skills.backend':           'Backend',
-                'skills.frontend':          'Frontend',
-                'skills.database':          'Banco de Dados',
-                'skills.aws':               'AWS (básico)',
-                'projects.title':           'Projetos.',
-                'projects.verve.desc':      'Organização focada no desenvolvimento de soluções completas e escaláveis. Repositório central com diversos projetos e colaborações em equipa.',
-                'projects.verve.tag1':      'Open Source',
-                'projects.verve.tag3':      'Colaboração',
-                'projects.bank.name':       'Desafio Bancário Java',
-                'projects.bank.desc':       'Sistema de gestão bancária desenvolvido em Java. Implementação rigorosa de regras de negócio, Programação Orientada a Objetos e arquitetura sólida.',
-                'projects.bank.tag4':       'Arquitetura',
-                'projects.cp4.desc':        'Projeto Front-End dinâmico e responsivo desenvolvido como parte do currículo prático da FIAP, focando em UI/UX e integração de interfaces.',
-                'contact.headline':         'Vamos<br><span class="ghost">criar</span><br>juntos?',
-                'contact.sub':              'Estou disponível para estágios, contratações ou só uma boa conversa sobre tecnologia.',
-                'footer.copy':              '© 2025 Igor Grave Teixeira',
-                'footer.made':              'Feito com <a href="#">código</a> e café ☕',
+                'a11y.skip':                  'Pular para os projetos',
+                'nav.location':               'São Paulo, BR · 2026',
+                'nav.about':                  'Sobre',
+                'nav.skills':                 'Skills',
+                'nav.projects':               'Projetos',
+                'nav.contact':                'Contato',
+                'hero.tag':                   'Aberto a oportunidades',
+                'hero.desc':                  'Desenvolvedor fullstack que tira projeto do papel: sites de clientes reais em produção, backend em Java e Node, e obsessão por código limpo.',
+                'hero.cta':                   'Ver projetos ↗',
+                'hero.info.roleLabel':        'Função',
+                'hero.info.roleValue':        'Fullstack / Backend Dev',
+                'hero.info.degreeLabel':      'Graduação',
+                'hero.info.degreeValue':      'Eng. de Software · FIAP',
+                'hero.info.locationLabel':    'Localização',
+                'hero.info.locationValue':    'São Paulo, Brasil',
+                'hero.info.focusLabel':       'Foco atual',
+                'hero.info.focusValue':       'APIs · Arquitetura · Cloud',
+                'hero.available':             '2 sites de clientes no ar',
+                'about.sideTag':              'Sobre mim',
+                'about.title':                'Menos promessa,<br><em>mais produção.</em>',
+                'about.p1':                   'Sou Igor Grave Teixeira, estudante de Engenharia de Software na FIAP e desenvolvedor fullstack em São Paulo. Enquanto curso a graduação, já entrego software de verdade: sites institucionais para clientes reais rodando em produção, sistemas em Java e interfaces que funcionam em qualquer tela.',
+                'about.p2':                   'Acredito que bom código é legível, testável e pronto para crescer — e que a melhor forma de aprender é colocando coisas no ar. Tudo que está aqui é público: código aberto, histórico de commits e deploy funcionando. Pode conferir.',
+                'about.fact.uniLabel':        'Universidade',
+                'about.fact.courseLabel':     'Curso',
+                'about.fact.courseValue':     'Eng. Software',
+                'about.fact.gradLabel':       'Formação prevista',
+                'about.fact.liveLabel':       'Projetos no ar',
+                'about.fact.statusLabel':     'Status',
+                'about.fact.statusValue':     'Disponível ✓',
+                'skills.title':               'Stack técnica.',
+                'skills.backend':             'Backend',
+                'skills.frontend':            'Frontend',
+                'skills.database':            'Banco de Dados',
+                'skills.tools':               'Ferramentas',
+                'skills.responsive':          'Design responsivo',
+                'skills.vercel':              'Vercel (deploy)',
+                'skills.docker':              'Docker (básico)',
+                'skills.radarLabel':          'No radar agora →',
+                'projects.title':             'Projetos.',
+                'projects.sub':               'Não é mockup nem tutorial: é código público com deploy rodando agora.',
+                'projects.clientBadge':       'Cliente real',
+                'projects.liveBadge':         'No ar',
+                'projects.viewSite':          'Ver site ↗',
+                'projects.viewCode':          'Código ↗',
+                'projects.cotseguro.desc':    'Site institucional completo para corretora de seguros de transporte: 4 páginas, formulário de cotação, menu mobile e animações. Entregue, publicado e em uso pelo cliente.',
+                'projects.vet.desc':          'Site de 6 páginas para médica-veterinária: serviços, vitrine de produtos e agendamento integrado com WhatsApp e Google Agenda. Configuração centralizada em JS para o cliente atualizar tudo num lugar só.',
+                'projects.vet.tagIntegration':'Integração WhatsApp',
+                'projects.bank.name':         'Sistema Bancário em Java',
+                'projects.bank.desc':         'Sistema de conta bancária via console: saldo, depósitos, transferências e validação de regras de negócio. Foco em lógica, fluxos de controle e organização de código em Java.',
+                'projects.bank.tagLogic':     'Regras de negócio',
+                'projects.cp4.desc':          'Projeto front-end dinâmico e responsivo do currículo prático da FIAP, com foco em UI/UX, manipulação de DOM e integração de interfaces.',
+                'projects.archiveTitle':      '+ Mais projetos no GitHub',
+                'projects.archiveLink':       'Ver todos os repositórios ↗',
+                'projects.archive.gsMeta':    'Front-end · Em dupla',
+                'projects.archive.gabiName':  'Portfolio para cliente',
+                'projects.archive.filmeName': 'Desafio Filme — Java',
+                'projects.archive.rpsMeta':   'Python · Lógica',
+                'projects.archive.jogoName':  'Jogo do Número Secreto',
+                'contact.headline':           'Vamos<br><span class="ghost">construir</span><br>juntos?',
+                'contact.sub':                'Estágio, vaga júnior ou freelance — me chama. Eu respondo rápido e chego com código pronto para mostrar.',
+                'footer.copy':                '© 2026 Igor Grave Teixeira',
+                'footer.made':                'Feito do zero — HTML, CSS e JS puros, num único arquivo. <a href="https://github.com/graveigor/IgorGrave-portfolio" target="_blank" rel="noopener">Ver código ↗</a>',
             },
             en: {
-                'nav.location':             'São Paulo, BR · 2025',
-                'nav.about':                'About',
-                'nav.skills':               'Skills',
-                'nav.projects':             'Projects',
-                'nav.contact':              'Contact',
-                'hero.tag':                 'Open to opportunities',
-                'hero.desc':                'Developer focused on building solid, scalable and well-architected systems.',
-                'hero.cta':                 'View projects ↗',
-                'hero.info.roleLabel':      'Role',
-                'hero.info.roleValue':      'Fullstack / Backend Dev',
-                'hero.info.degreeLabel':    'Degree',
-                'hero.info.degreeValue':    'Software Eng. · FIAP',
-                'hero.info.locationLabel':  'Location',
-                'hero.info.locationValue':  'São Paulo, Brazil',
-                'hero.info.focusLabel':     'Current focus',
-                'hero.info.focusValue':     'APIs · Architecture · Cloud',
-                'hero.available':           'Available for hire',
-                'about.sideTag':            'About me',
-                'about.title':              'Precise <em>code,</em><br>architecture<br>that lasts.',
-                'about.p1':                 'Hi! I\'m Igor Grave Teixeira, 19 years old, a Software Engineering student at FIAP in São Paulo. I\'m passionate about Fullstack / Backend development, building applications end-to-end: from the visual experience to the robust server architecture.',
-                'about.p2':                 'I believe good code is more than working: it\'s readable, testable and ready to grow. I\'m always learning, building and looking for my first big opportunity in the market.',
-                'about.fact.ageLabel':      'Age',
-                'about.fact.uniLabel':      'University',
-                'about.fact.courseLabel':   'Degree',
-                'about.fact.courseValue':   'Software Eng.',
-                'about.fact.focusLabel':    'Focus',
-                'about.fact.statusLabel':   'Status',
-                'about.fact.statusValue':   'Available ✓',
-                'skills.title':             'Tech stack.',
-                'skills.backend':           'Backend',
-                'skills.frontend':          'Frontend',
-                'skills.database':          'Databases',
-                'skills.aws':               'AWS (basic)',
-                'projects.title':           'Projects.',
-                'projects.verve.desc':      'Organization focused on building complete and scalable solutions. Central repository with several projects and team collaborations.',
-                'projects.verve.tag1':      'Open Source',
-                'projects.verve.tag3':      'Collaboration',
-                'projects.bank.name':       'Java Banking Challenge',
-                'projects.bank.desc':       'Banking management system developed in Java. Rigorous implementation of business rules, Object-Oriented Programming and solid architecture.',
-                'projects.bank.tag4':       'Architecture',
-                'projects.cp4.desc':        'Dynamic and responsive Front-End project developed as part of FIAP\'s practical curriculum, focusing on UI/UX and interface integration.',
-                'contact.headline':         'Let\'s<br><span class="ghost">build</span><br>together?',
-                'contact.sub':              'Available for internships, full-time roles or just a good chat about technology.',
-                'footer.copy':              '© 2025 Igor Grave Teixeira',
-                'footer.made':              'Made with <a href="#">code</a> and coffee ☕',
+                'a11y.skip':                  'Skip to projects',
+                'nav.location':               'São Paulo, BR · 2026',
+                'nav.about':                  'About',
+                'nav.skills':                 'Skills',
+                'nav.projects':               'Projects',
+                'nav.contact':                'Contact',
+                'hero.tag':                   'Open to opportunities',
+                'hero.desc':                  'Fullstack developer who ships: real client websites in production, backend in Java and Node, and an obsession with clean code.',
+                'hero.cta':                   'View projects ↗',
+                'hero.info.roleLabel':        'Role',
+                'hero.info.roleValue':        'Fullstack / Backend Dev',
+                'hero.info.degreeLabel':      'Degree',
+                'hero.info.degreeValue':      'Software Eng. · FIAP',
+                'hero.info.locationLabel':    'Location',
+                'hero.info.locationValue':    'São Paulo, Brazil',
+                'hero.info.focusLabel':       'Current focus',
+                'hero.info.focusValue':       'APIs · Architecture · Cloud',
+                'hero.available':             '2 client sites in production',
+                'about.sideTag':              'About me',
+                'about.title':                'Less talk,<br><em>more shipping.</em>',
+                'about.p1':                   'I\'m Igor Grave Teixeira, a Software Engineering student at FIAP and a fullstack developer in São Paulo. While studying, I already deliver real software: institutional websites for real clients running in production, Java systems and interfaces that work on any screen.',
+                'about.p2':                   'I believe good code is readable, testable and ready to grow — and that the best way to learn is by shipping. Everything here is public: open code, commit history and working deploys. Go check.',
+                'about.fact.uniLabel':        'University',
+                'about.fact.courseLabel':     'Degree',
+                'about.fact.courseValue':     'Software Eng.',
+                'about.fact.gradLabel':       'Graduating',
+                'about.fact.liveLabel':       'Live projects',
+                'about.fact.statusLabel':     'Status',
+                'about.fact.statusValue':     'Available ✓',
+                'skills.title':               'Tech stack.',
+                'skills.backend':             'Backend',
+                'skills.frontend':            'Frontend',
+                'skills.database':            'Databases',
+                'skills.tools':               'Tooling',
+                'skills.responsive':          'Responsive design',
+                'skills.vercel':              'Vercel (deploys)',
+                'skills.docker':              'Docker (basics)',
+                'skills.radarLabel':          'On the radar →',
+                'projects.title':             'Projects.',
+                'projects.sub':               'No mockups, no tutorials: public code with live deploys you can open right now.',
+                'projects.clientBadge':       'Real client',
+                'projects.liveBadge':         'Live',
+                'projects.viewSite':          'View site ↗',
+                'projects.viewCode':          'Code ↗',
+                'projects.cotseguro.desc':    'Complete institutional website for a cargo insurance brokerage: 4 pages, quote form, mobile menu and animations. Delivered, published and in use by the client.',
+                'projects.vet.desc':          '6-page website for a veterinarian: services, product showcase and appointment booking integrated with WhatsApp and Google Calendar. Centralized JS config so the client updates everything in one place.',
+                'projects.vet.tagIntegration':'WhatsApp integration',
+                'projects.bank.name':         'Java Banking System',
+                'projects.bank.desc':         'Console banking system: balance, deposits, transfers and business-rule validation. Focused on logic, control flow and clean code organization in Java.',
+                'projects.bank.tagLogic':     'Business rules',
+                'projects.cp4.desc':          'Dynamic, responsive front-end project from FIAP\'s hands-on curriculum, focused on UI/UX, DOM manipulation and interface integration.',
+                'projects.archiveTitle':      '+ More projects on GitHub',
+                'projects.archiveLink':       'See all repositories ↗',
+                'projects.archive.gsMeta':    'Front-end · Pair project',
+                'projects.archive.gabiName':  'Client portfolio website',
+                'projects.archive.filmeName': 'Movie Challenge — Java',
+                'projects.archive.rpsMeta':   'Python · Logic',
+                'projects.archive.jogoName':  'Secret Number Game',
+                'contact.headline':           'Let\'s<br><span class="ghost">build</span><br>together?',
+                'contact.sub':                'Internship, junior role or freelance — reach out. I reply fast and show up with code ready to demo.',
+                'footer.copy':                '© 2026 Igor Grave Teixeira',
+                'footer.made':                'Built from scratch — pure HTML, CSS & JS in a single file. <a href="https://github.com/graveigor/IgorGrave-portfolio" target="_blank" rel="noopener">View source ↗</a>',
             }
         };
 
         let currentLang = 'pt';
 
+        function applyLang(lang) {
+            document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.dataset.i18n;
+                const text = TRANSLATIONS[lang][key];
+                if (text !== undefined) {
+                    el.innerHTML = text;
+                }
+            });
+
+            document.querySelectorAll('.lang-opt').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === lang);
+            });
+        }
+
         function setLang(lang) {
             if (lang === currentLang) return;
             currentLang = lang;
 
-            /* Atualiza atributo do html para acessibilidade */
-            document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
+            try { localStorage.setItem('lang', lang); } catch (e) { /* navegação privada */ }
 
-            /* Fade-out rápido */
+            /* Fade-out rápido, troca, fade-in */
             document.body.classList.add('lang-switching');
-
             setTimeout(() => {
-                /* Atualiza todos os elementos com data-i18n */
-                document.querySelectorAll('[data-i18n]').forEach(el => {
-                    const key = el.dataset.i18n;
-                    const text = TRANSLATIONS[lang][key];
-                    if (text !== undefined) {
-                        el.innerHTML = text;
-                    }
-                });
-
-                /* Atualiza botões ativos */
-                document.querySelectorAll('.lang-opt').forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.lang === lang);
-                });
-
-                /* Fade-in */
+                applyLang(lang);
                 document.body.classList.remove('lang-switching');
             }, 180);
         }
+
+        /* Idioma inicial: escolha salva > idioma do navegador > PT */
+        (function initLang() {
+            let saved = null;
+            try { saved = localStorage.getItem('lang'); } catch (e) { /* navegação privada */ }
+
+            const browserLang = (navigator.language || 'pt').toLowerCase();
+            const initial = saved || (browserLang.startsWith('pt') ? 'pt' : 'en');
+
+            if (initial !== 'pt') {
+                currentLang = initial;
+                applyLang(initial);
+            }
+        })();
 
         /* ────────────────────────────────────────────
            ANIMAÇÃO DE REVELAÇÃO (SCROLL)
@@ -1348,6 +1817,18 @@
         }, { threshold: 0.15 });
 
         revealElements.forEach(el => obs.observe(el));
+
+        /* ────────────────────────────────────────────
+           EASTER EGG PARA QUEM ABRE O DEVTOOLS 👀
+        ──────────────────────────────────────────── */
+        console.log(
+            '%cE aí, curioso(a) 👀',
+            'font-size:20px;font-weight:bold;color:#ff3d00;'
+        );
+        console.log(
+            '%cEste site é HTML, CSS e JS puros — sem framework, num único arquivo.\nCódigo aberto: https://github.com/graveigor/IgorGrave-portfolio\nBora conversar? igorgraveteixeira@gmail.com',
+            'font-size:13px;color:#0a0a0a;'
+        );
     </script>
 
 </body>
