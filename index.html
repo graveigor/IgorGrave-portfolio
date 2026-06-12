@@ -1283,15 +1283,11 @@
     <a class="skip-link" href="#projects" data-i18n="a11y.skip">Pular para os projetos</a>
 
     <div class="marquee-strip" aria-hidden="true">
-        <div class="marquee-track">
-            IGOR GRAVE TEIXEIRA <span class="marquee-dot"></span>
-            FULLSTACK DEVELOPER <span class="marquee-dot"></span>
-            ENGENHARIA DE SOFTWARE <span class="marquee-dot"></span>
-            SITES EM PRODUÇÃO <span class="marquee-dot"></span>
-            IGOR GRAVE TEIXEIRA <span class="marquee-dot"></span>
-            FULLSTACK DEVELOPER <span class="marquee-dot"></span>
-            ENGENHARIA DE SOFTWARE <span class="marquee-dot"></span>
-            SITES EM PRODUÇÃO <span class="marquee-dot"></span>
+        <div class="marquee-track" id="marqueeTrack">
+            <span class="marquee-seq">IGOR GRAVE TEIXEIRA <span class="marquee-dot"></span>
+                FULLSTACK DEVELOPER <span class="marquee-dot"></span>
+                ENGENHARIA DE SOFTWARE <span class="marquee-dot"></span>
+                SITES EM PRODUÇÃO <span class="marquee-dot"></span></span>
         </div>
     </div>
 
@@ -1817,6 +1813,46 @@
         }, { threshold: 0.15 });
 
         revealElements.forEach(el => obs.observe(el));
+
+        /* ────────────────────────────────────────────
+           MARQUEE: duplica o conteúdo até cobrir a tela
+           (evita o vão vazio em monitores largos)
+        ──────────────────────────────────────────── */
+        (function () {
+            const track = document.getElementById('marqueeTrack');
+            if (!track) return;
+            const base = track.querySelector('.marquee-seq');
+
+            function buildMarquee() {
+                track.querySelectorAll('.marquee-seq').forEach((el, i) => {
+                    if (i > 0) el.remove();
+                });
+
+                const seqWidth = base.offsetWidth;
+                if (!seqWidth) return;
+
+                /* metade da faixa precisa ser >= largura da tela */
+                const target = Math.max(window.innerWidth, screen.width || 0);
+                const copies = Math.ceil(target / seqWidth) + 1;
+                for (let i = 1; i < copies * 2; i++) {
+                    track.appendChild(base.cloneNode(true));
+                }
+
+                /* velocidade constante (~40px/s) em qualquer tela */
+                track.style.animationDuration = (seqWidth * copies / 40) + 's';
+            }
+
+            buildMarquee();
+            /* re-mede quando a fonte termina de carregar e ao redimensionar */
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(buildMarquee);
+            }
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(buildMarquee, 200);
+            });
+        })();
 
         /* ────────────────────────────────────────────
            EASTER EGG PARA QUEM ABRE O DEVTOOLS 👀
