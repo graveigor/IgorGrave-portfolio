@@ -60,6 +60,13 @@
         href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300;1,9..144,700&display=swap"
         rel="stylesheet" />
 
+    <!-- Marca o documento antes do primeiro paint: só esconde o hero se o JS for animar -->
+    <script>
+        document.documentElement.classList.add('js');
+        /* se a CDN travar, não deixa o topo em branco */
+        setTimeout(() => { if (!window.__introStarted) document.documentElement.classList.remove('js'); }, 2500);
+    </script>
+
     <style>
         /* ── VARIÁVEIS DE COR ── */
         :root {
@@ -68,9 +75,12 @@
             --mid: #d4cfc8;
             --faint: #e8e3db;
             --accent: #ff3d00;
+            --accent-ink: #c42e00; /* laranja escurecido p/ texto pequeno sobre o papel */
             --accent2: #ffd600;
             --blue: #0033ff;
-            --green: #00a34a;
+            --green: #007a37;
+            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+            --nav-h: 56px;
         }
 
         /* ── RESET BÁSICO ── */
@@ -84,6 +94,18 @@
 
         html {
             scroll-behavior: smooth;
+            scroll-padding-top: var(--nav-h);
+            scrollbar-color: var(--ink) var(--faint);
+        }
+
+        /* Lenis assume o scroll quando ativo */
+        html.lenis,
+        html.lenis body {
+            height: auto;
+        }
+
+        .lenis.lenis-smooth {
+            scroll-behavior: auto !important;
         }
 
         body {
@@ -95,9 +117,36 @@
             cursor: crosshair;
         }
 
+        a,
+        button {
+            cursor: pointer;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
         ::selection {
             background: var(--accent);
             color: var(--paper);
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--faint);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--ink);
+            border: 2px solid var(--faint);
+        }
+
+        section:focus {
+            outline: none;
         }
 
         a:focus-visible,
@@ -169,15 +218,28 @@
             grid-template-columns: 1fr auto 1fr;
             align-items: center;
             padding: 0 2rem;
-            height: 56px;
+            height: var(--nav-h);
+        }
+
+        /* barra de progresso da leitura, logo abaixo da nav */
+        .scroll-progress {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -2px;
+            height: 3px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            pointer-events: none;
         }
 
         .nav-left {
-            font-size: 0.68rem;
+            font-size: 0.74rem;
             letter-spacing: 0.15em;
             text-transform: uppercase;
             color: var(--ink);
-            opacity: 0.45;
+            opacity: 0.65;
         }
 
         .nav-logo {
@@ -186,6 +248,7 @@
             letter-spacing: 0.1em;
             color: var(--ink);
             text-align: center;
+            text-decoration: none;
         }
 
         .nav-right {
@@ -195,18 +258,40 @@
             gap: 2rem;
         }
 
-        .nav-right a {
-            font-size: 0.68rem;
+        .nav-link {
+            position: relative;
+            font-size: 0.74rem;
             letter-spacing: 0.12em;
             text-transform: uppercase;
             color: var(--ink);
             text-decoration: none;
-            opacity: 0.5;
+            opacity: 0.65;
+            padding: 0.4rem 0;
             transition: opacity 0.15s;
         }
 
-        .nav-right a:hover {
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 2px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.45s var(--ease-out);
+        }
+
+        .nav-link:hover,
+        .nav-link.is-active {
             opacity: 1;
+        }
+
+        .nav-link:hover::after,
+        .nav-link.is-active::after {
+            transform: scaleX(1);
+            transform-origin: left;
         }
 
         /* ── BOTÃO DE IDIOMA ── */
@@ -216,13 +301,12 @@
             gap: 0;
             border: 1.5px solid var(--ink);
             overflow: hidden;
-            cursor: pointer;
             flex-shrink: 0;
         }
 
         .lang-opt {
             font-family: 'DM Mono', monospace;
-            font-size: 0.62rem;
+            font-size: 0.7rem;
             font-weight: 400;
             letter-spacing: 0.12em;
             text-transform: uppercase;
@@ -230,8 +314,7 @@
             background: transparent;
             color: var(--ink);
             border: none;
-            cursor: pointer;
-            opacity: 0.35;
+            opacity: 0.55;
             transition: background 0.18s, color 0.18s, opacity 0.18s;
             line-height: 1;
         }
@@ -243,7 +326,7 @@
         }
 
         .lang-opt:not(.active):hover {
-            opacity: 0.7;
+            opacity: 0.85;
         }
 
         .lang-divider {
@@ -253,20 +336,63 @@
             align-self: stretch;
         }
 
+        /* ── BOTÕES ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 400;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            text-decoration: none;
+            padding: 1rem 1.7rem;
+            border: 2px solid var(--ink);
+            white-space: nowrap;
+            transition: background 0.18s, color 0.18s, translate 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+        }
+
+        .btn-primary {
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent);
+            border-color: var(--ink);
+            color: var(--ink);
+            translate: -3px -3px;
+            box-shadow: 5px 5px 0 var(--ink);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--ink);
+        }
+
+        .btn-ghost:hover {
+            background: var(--ink);
+            color: var(--paper);
+            translate: -3px -3px;
+            box-shadow: 5px 5px 0 var(--accent);
+        }
+
         /* ── SEÇÃO PRINCIPAL (HERO) ── */
         #hero {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            min-height: calc(100vh - 78px);
+            grid-template-columns: 1.05fr 0.95fr;
+            min-height: calc(100svh - 78px);
             border-bottom: 2px solid var(--ink);
         }
 
         .hero-left {
-            padding: 5rem 3rem 4rem;
+            padding: 4rem 3rem 3.5rem;
             border-right: 2px solid var(--ink);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            gap: 3rem;
         }
 
         .hero-tag {
@@ -275,11 +401,11 @@
             gap: 0.6rem;
             border: 1.5px solid var(--ink);
             padding: 0.35rem 0.9rem;
-            font-size: 0.68rem;
+            font-size: 0.74rem;
             letter-spacing: 0.15em;
             text-transform: uppercase;
             width: fit-content;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
         }
 
         .hero-tag-dot {
@@ -297,121 +423,311 @@
 
         .hero-name {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(5rem, 9vw, 10rem);
-            line-height: 0.9;
+            font-size: clamp(4.5rem, 8.4vw, 9.5rem);
+            font-weight: 400;
+            line-height: 0.88;
             letter-spacing: -0.01em;
             color: var(--ink);
+        }
+
+        /* cada linha do nome fica numa "janela" para a animação de entrada */
+        .hero-name .line {
+            display: block;
+            overflow: hidden;
+            padding-bottom: 0.04em;
+        }
+
+        .hero-name .line > span {
+            display: block;
         }
 
         .hero-name .stroke {
             color: transparent;
             -webkit-text-stroke: 2.5px var(--ink);
+            transition: color 0.5s var(--ease-out), -webkit-text-stroke-color 0.5s var(--ease-out);
         }
 
-        .hero-bottom {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            gap: 1rem;
+        .hero-name:hover .stroke {
+            color: var(--accent);
+            -webkit-text-stroke-color: var(--accent);
+        }
+
+        .hero-lead {
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            font-weight: 300;
+            font-size: clamp(1.35rem, 2vw, 1.85rem);
+            line-height: 1.3;
+            max-width: 30ch;
+            margin-top: 1.8rem;
+            text-wrap: balance;
+        }
+
+        .hero-lead em {
+            font-weight: 700;
+            font-style: italic;
+            color: var(--accent);
         }
 
         .hero-desc {
-            font-family: 'Fraunces', serif;
-            font-style: italic;
-            font-size: 1.05rem;
+            font-size: 0.82rem;
             line-height: 1.75;
-            color: var(--ink);
-            max-width: 340px;
+            max-width: 48ch;
+            margin-top: 1rem;
+            color: rgba(10, 10, 10, 0.78);
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.9rem;
+        }
+
+        .hero-proof {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem 1.4rem;
+            margin-top: 1.4rem;
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
             opacity: 0.7;
         }
 
-        .btn-hero {
+        .hero-proof span::before {
+            content: '';
             display: inline-block;
-            background: var(--ink);
-            color: var(--paper);
-            font-family: 'DM Mono', monospace;
-            font-size: 0.72rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            text-decoration: none;
-            padding: 1rem 2rem;
-            border: 2px solid var(--ink);
-            white-space: nowrap;
-            transition: background 0.18s, color 0.18s, transform 0.18s, box-shadow 0.18s;
-        }
-
-        .btn-hero:hover {
+            width: 6px;
+            height: 6px;
             background: var(--accent);
-            border-color: var(--accent);
-            transform: translate(-3px, -3px);
-            box-shadow: 5px 5px 0 var(--ink);
+            margin-right: 0.55rem;
+            vertical-align: 0.1em;
         }
 
-        /* ── LADO DIREITO DO HERO ── */
+        /* ── VITRINE DE PROJETOS NO AR (HERO DIREITO) ── */
         .hero-right {
             position: relative;
-            overflow: hidden;
             background: var(--faint);
-        }
-
-        .hero-big-num {
-            position: absolute;
-            bottom: -0.1em;
-            right: -0.05em;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(14rem, 22vw, 28rem);
-            color: transparent;
-            -webkit-text-stroke: 2px var(--mid);
-            line-height: 1;
-            user-select: none;
-            pointer-events: none;
-        }
-
-        .hero-info-box {
-            position: absolute;
-            top: 3rem;
-            left: 3rem;
-            right: 3rem;
-        }
-
-        .info-row {
+            padding: 4rem 3rem 3.5rem;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--mid);
-            padding: 1rem 0;
-            font-size: 0.75rem;
-            letter-spacing: 0.08em;
+            overflow: hidden;
         }
 
-        .info-row:first-child {
-            border-top: 1px solid var(--mid);
+
+        .showcase {
+            position: relative;
+            width: 100%;
         }
 
-        .info-label {
+        .showcase-label {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
             text-transform: uppercase;
-            letter-spacing: 0.15em;
-            opacity: 0.4;
-            font-size: 0.65rem;
+            margin-bottom: 1rem;
         }
 
-        .info-value {
+        .showcase-label::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse-dot 1.6s ease-in-out infinite;
+        }
+
+        .browser {
+            position: relative;
+            border: 2px solid var(--ink);
+            background: var(--paper);
+            box-shadow: 10px 10px 0 var(--ink);
+        }
+
+        .browser-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.55rem 0.8rem;
+            border-bottom: 2px solid var(--ink);
+            background: var(--paper);
+        }
+
+        .browser-dots {
+            display: flex;
+            gap: 5px;
+        }
+
+        .browser-dots i {
+            width: 9px;
+            height: 9px;
+            border: 1.5px solid var(--ink);
+        }
+
+        .browser-dots i:first-child {
+            background: var(--accent);
+        }
+
+        .browser-url {
+            flex: 1;
+            font-size: 0.72rem;
+            letter-spacing: 0.06em;
+            border: 1.5px solid var(--ink);
+            padding: 0.25rem 0.7rem;
+            background: #fff;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .browser-view {
+            position: relative;
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+            background: var(--ink);
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            visibility: hidden;
+        }
+
+        .slide.is-prev {
+            z-index: 1;
+            visibility: visible;
+        }
+
+        .slide.is-active {
+            z-index: 2;
+            visibility: visible;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+        }
+
+        .sticker {
+            position: absolute;
+            top: -1.1rem;
+            right: -0.8rem;
+            z-index: 5;
+            background: var(--accent2);
+            color: var(--ink);
+            border: 2px solid var(--ink);
+            padding: 0.55rem 0.9rem;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.05rem;
+            letter-spacing: 0.1em;
+            rotate: 4deg;
+        }
+
+        .showcase-caps {
+            display: grid;
+            margin-top: 1.6rem;
+            min-height: 3.2em;
+        }
+
+        /* todas as legendas na mesma célula: só a ativa aparece */
+        .show-cap {
+            grid-area: 1 / 1;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.4s var(--ease-out), transform 0.5s var(--ease-out);
             font-family: 'Fraunces', serif;
             font-style: italic;
-            font-size: 1rem;
+            font-size: 1.05rem;
+            line-height: 1.45;
         }
 
-        .hero-accent-block {
-            position: absolute;
-            bottom: 3rem;
-            left: 3rem;
-            background: var(--accent);
-            color: var(--paper);
-            padding: 1.2rem 1.8rem;
+        .show-cap strong {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.1rem;
-            letter-spacing: 0.15em;
-            border: 2px solid var(--ink);
+            font-style: normal;
+            font-weight: 400;
+            font-size: 1.3rem;
+            letter-spacing: 0.04em;
+            margin-right: 0.4rem;
+        }
+
+        .show-cap.is-active {
+            opacity: 1;
+            transform: none;
+        }
+
+        .show-tabs {
+            display: grid;
+            grid-template-columns: auto repeat(5, 1fr);
+            align-items: end;
+            gap: 0.5rem;
+            margin-top: 1.2rem;
+        }
+
+        .show-toggle {
+            width: 32px;
+            height: 32px;
+            border: 1.5px solid var(--ink);
+            background: var(--paper);
+            color: var(--ink);
+            font-size: 0.6rem;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .show-toggle:hover {
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        .show-tab {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-align: left;
+            color: var(--ink);
+            background: none;
+            border: none;
+            padding: 0.6rem 0 0;
+            position: relative;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .show-tab::before,
+        .show-tab .fill {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--mid);
+        }
+
+        .show-tab .fill {
+            background: var(--ink);
+            transform: scaleX(0);
+            transform-origin: left;
+        }
+
+        .show-tab[aria-current="true"] {
+            opacity: 1;
+        }
+
+        .show-tab[aria-current="true"] .fill {
+            transform: scaleX(1);
+        }
+
+        .show-tab:hover {
+            opacity: 1;
         }
 
         /* ── SEÇÃO SOBRE (ABOUT) ── */
@@ -438,10 +754,10 @@
         }
 
         .section-tag {
-            font-size: 0.65rem;
+            font-size: 0.72rem;
             letter-spacing: 0.2em;
             text-transform: uppercase;
-            opacity: 0.4;
+            opacity: 0.65;
             writing-mode: vertical-lr;
             transform: rotate(180deg);
             align-self: flex-end;
@@ -453,6 +769,7 @@
 
         .about-title {
             font-family: 'Bebas Neue', sans-serif;
+            font-weight: 400;
             font-size: clamp(3rem, 5vw, 5.5rem);
             letter-spacing: -0.01em;
             line-height: 1;
@@ -476,7 +793,8 @@
             font-style: italic;
             font-size: 1.05rem;
             line-height: 1.85;
-            opacity: 0.75;
+            max-width: 62ch;
+            opacity: 0.85;
         }
 
         .about-text p+p {
@@ -488,6 +806,7 @@
             flex-direction: column;
             gap: 0;
             border: 1.5px solid var(--ink);
+            align-self: start;
         }
 
         .fact {
@@ -496,6 +815,11 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            transition: background 0.2s;
+        }
+
+        .fact:hover {
+            background: var(--faint);
         }
 
         .fact:last-child {
@@ -503,16 +827,17 @@
         }
 
         .fact-label {
-            font-size: 0.65rem;
+            font-size: 0.72rem;
             letter-spacing: 0.15em;
             text-transform: uppercase;
-            opacity: 0.4;
+            opacity: 0.65;
         }
 
         .fact-value {
             font-family: 'Bebas Neue', sans-serif;
             font-size: 1.4rem;
             letter-spacing: 0.05em;
+            font-variant-numeric: tabular-nums;
         }
 
         .fact-value.accent {
@@ -529,7 +854,6 @@
         .skills-header {
             display: grid;
             grid-template-columns: 240px 1fr;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.12);
         }
 
         .skills-header-left {
@@ -539,21 +863,33 @@
 
         .skills-header-left .section-num {
             color: transparent;
-            -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.15);
+            -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.2);
         }
 
         .skills-header-right {
             padding: 2.5rem 3rem;
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
         }
 
         .skills-title {
             font-family: 'Bebas Neue', sans-serif;
+            font-weight: 400;
             font-size: clamp(3rem, 5vw, 5rem);
             letter-spacing: -0.01em;
             color: var(--paper);
             line-height: 1;
+        }
+
+        .skills-sub {
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            font-size: 0.95rem;
+            opacity: 0.75;
+            max-width: 320px;
+            text-align: right;
         }
 
         .skills-grid {
@@ -563,28 +899,38 @@
         }
 
         .skill-col {
+            position: relative;
             padding: 2.5rem 2rem;
             border-right: 2px solid rgba(255, 255, 255, 0.12);
-            transition: background 0.2s;
+            overflow: hidden;
+        }
+
+        /* faixa laranja que sobe no hover da coluna */
+        .skill-col::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 3px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s var(--ease-out);
+        }
+
+        .skill-col:hover::before {
+            transform: scaleX(1);
         }
 
         .skill-col:last-child {
             border-right: none;
         }
 
-        .skill-col:hover {
-            background: rgba(255, 255, 255, 0.04);
-        }
-
-        .skill-col-icon {
-            font-size: 1.4rem;
-            margin-bottom: 1rem;
-        }
-
         .skill-col-name {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.1rem;
-            letter-spacing: 0.12em;
+            font-size: 1.6rem;
+            letter-spacing: 0.08em;
             color: var(--accent2);
             margin-bottom: 1.5rem;
         }
@@ -597,24 +943,27 @@
         }
 
         .skill-list li {
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             letter-spacing: 0.06em;
-            opacity: 0.55;
+            opacity: 0.75;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            transition: opacity 0.15s;
+            transition: opacity 0.2s, translate 0.35s var(--ease-out);
         }
 
         .skill-list li::before {
             content: '→';
             color: var(--accent);
             font-size: 0.7rem;
-            opacity: 0.7;
         }
 
         .skill-col:hover .skill-list li {
-            opacity: 0.85;
+            opacity: 1;
+        }
+
+        .skill-list li:hover {
+            translate: 6px 0;
         }
 
         /* ── FAIXA "NO RADAR" (SKILLS EM ESTUDO) ── */
@@ -628,19 +977,25 @@
         }
 
         .radar-label {
-            font-size: 0.62rem;
+            font-size: 0.7rem;
             letter-spacing: 0.2em;
             text-transform: uppercase;
             color: var(--accent2);
-            opacity: 0.9;
         }
 
         .radar-item {
             font-size: 0.72rem;
             letter-spacing: 0.1em;
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             padding: 0.3rem 0.8rem;
-            opacity: 0.6;
+            opacity: 0.8;
+            transition: background 0.2s, color 0.2s, opacity 0.2s;
+        }
+
+        .radar-item:hover {
+            background: var(--paper);
+            color: var(--ink);
+            opacity: 1;
         }
 
         /* ── SEÇÃO PROJETOS ── */
@@ -669,6 +1024,7 @@
 
         .projects-title {
             font-family: 'Bebas Neue', sans-serif;
+            font-weight: 400;
             font-size: clamp(3rem, 5vw, 5rem);
             letter-spacing: -0.01em;
             line-height: 1;
@@ -678,17 +1034,16 @@
             font-family: 'Fraunces', serif;
             font-style: italic;
             font-size: 0.95rem;
-            opacity: 0.55;
+            opacity: 0.75;
             max-width: 320px;
             text-align: right;
         }
 
         .project-row {
             display: grid;
-            grid-template-columns: 240px 1fr auto;
+            grid-template-columns: 240px 1fr minmax(260px, 34%);
             border-bottom: 2px solid var(--ink);
-            min-height: 100px;
-            transition: background 0.2s;
+            transition: background 0.3s;
         }
 
         .project-row:hover {
@@ -697,20 +1052,25 @@
 
         .project-index {
             border-right: 2px solid var(--ink);
-            padding: 2rem;
+            padding: 2.5rem 2rem;
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 2.5rem;
-            color: var(--mid);
-            display: flex;
-            align-items: center;
+            font-size: 3.5rem;
+            line-height: 1;
+            color: transparent;
+            -webkit-text-stroke: 1.5px var(--ink);
+            transition: color 0.3s;
+        }
+
+        .project-row:hover .project-index {
+            color: var(--accent);
+            -webkit-text-stroke-color: var(--accent);
         }
 
         .project-body {
-            padding: 2rem 3rem 2rem 2.5rem;
+            padding: 2.5rem 2.5rem;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            gap: 0.6rem;
+            gap: 0.7rem;
         }
 
         .project-name-row {
@@ -722,7 +1082,8 @@
 
         .project-name {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 2rem;
+            font-weight: 400;
+            font-size: clamp(1.9rem, 2.6vw, 2.5rem);
             letter-spacing: 0.02em;
             line-height: 1;
             transition: color 0.15s;
@@ -732,11 +1093,21 @@
             color: var(--accent);
         }
 
+        /* frase simples: o que é o projeto, para quem não é dev */
+        .project-tagline {
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            line-height: 1.45;
+            max-width: 46ch;
+        }
+
         .status-badge {
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
-            font-size: 0.6rem;
+            font-size: 0.7rem;
+            font-weight: 400;
             letter-spacing: 0.18em;
             text-transform: uppercase;
             border: 1.5px solid var(--green);
@@ -757,7 +1128,7 @@
         .client-badge {
             display: inline-flex;
             align-items: center;
-            font-size: 0.6rem;
+            font-size: 0.7rem;
             letter-spacing: 0.18em;
             text-transform: uppercase;
             background: var(--ink);
@@ -767,60 +1138,59 @@
         }
 
         .project-desc {
-            font-size: 0.78rem;
-            opacity: 0.5;
-            line-height: 1.6;
-            max-width: 560px;
+            font-size: 0.76rem;
+            color: rgba(10, 10, 10, 0.75);
+            line-height: 1.7;
+            max-width: 62ch;
         }
 
         .project-tags {
             display: flex;
             flex-wrap: wrap;
             gap: 0.4rem;
-            margin-top: 0.3rem;
         }
 
         .project-tag {
-            font-size: 0.62rem;
+            font-size: 0.7rem;
             letter-spacing: 0.12em;
             text-transform: uppercase;
             border: 1px solid var(--ink);
             padding: 0.2rem 0.55rem;
-            opacity: 0.45;
+            opacity: 0.65;
             transition: opacity 0.15s, border-color 0.15s, color 0.15s;
         }
 
         .project-row:hover .project-tag {
             opacity: 1;
-            border-color: var(--accent);
-            color: var(--accent);
+            border-color: var(--accent-ink);
+            color: var(--accent-ink);
         }
 
         .project-actions {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
+            flex-wrap: wrap;
             gap: 0.6rem;
-            padding: 2rem 2.5rem 2rem 1rem;
+            margin-top: 0.6rem;
         }
 
         .project-link {
-            font-size: 0.65rem;
+            font-size: 0.72rem;
+            font-weight: 400;
             letter-spacing: 0.15em;
             text-transform: uppercase;
             text-decoration: none;
             color: var(--ink);
             border: 1.5px solid var(--ink);
-            padding: 0.55rem 1.1rem;
+            padding: 0.6rem 1.1rem;
             text-align: center;
             white-space: nowrap;
-            transition: background 0.15s, color 0.15s, transform 0.15s, box-shadow 0.15s;
+            transition: background 0.15s, color 0.15s, translate 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
         }
 
         .project-link:hover {
             background: var(--ink);
             color: var(--paper);
-            transform: translate(-2px, -2px);
+            translate: -2px -2px;
             box-shadow: 4px 4px 0 var(--accent);
         }
 
@@ -831,7 +1201,75 @@
 
         .project-link.primary:hover {
             background: var(--accent);
-            border-color: var(--accent);
+            border-color: var(--ink);
+            color: var(--ink);
+            box-shadow: 4px 4px 0 var(--ink);
+        }
+
+        /* miniatura real do site, à direita de cada projeto */
+        .project-media {
+            padding: 2.5rem 2.5rem 2.5rem 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .project-thumb {
+            display: block;
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            border: 2px solid var(--ink);
+            overflow: hidden;
+            background: var(--ink);
+            transition: translate 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out);
+        }
+
+        .project-thumb img {
+            width: 100%;
+            height: 115%;
+            object-fit: cover;
+            object-position: top center;
+            transition: scale 0.8s var(--ease-out);
+        }
+
+        .project-row:hover .project-thumb {
+            translate: -4px -4px;
+            box-shadow: 8px 8px 0 var(--accent);
+        }
+
+        .project-row:hover .project-thumb img {
+            scale: 1.05;
+        }
+
+        /* "print" do terminal do projeto Java (não tem site) */
+        .terminal {
+            height: 100%;
+            padding: 1.2rem 1.3rem;
+            color: var(--paper);
+            font-size: 0.74rem;
+            line-height: 1.85;
+            white-space: pre;
+            overflow: hidden;
+        }
+
+        .terminal .t-prompt {
+            color: var(--accent2);
+        }
+
+        .terminal .t-ok {
+            color: #5be38f;
+        }
+
+        .terminal .t-caret {
+            display: inline-block;
+            width: 0.6em;
+            height: 1em;
+            background: var(--accent);
+            vertical-align: -0.15em;
+            animation: blink 1s steps(1) infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
         }
 
         /* ── ARQUIVO DE PROJETOS (MAIS NO GITHUB) ── */
@@ -852,7 +1290,7 @@
         }
 
         .archive-gh-link {
-            font-size: 0.65rem;
+            font-size: 0.72rem;
             letter-spacing: 0.15em;
             text-transform: uppercase;
             color: var(--ink);
@@ -868,7 +1306,7 @@
 
         .archive-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
         }
 
         .archive-card {
@@ -880,38 +1318,39 @@
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
-            transition: background 0.18s;
+            transition: background 0.25s, color 0.25s;
             position: relative;
         }
 
-        .archive-grid .archive-card:nth-child(3n) {
+        .archive-grid .archive-card:nth-child(4n) {
             border-right: none;
         }
 
-        .archive-grid .archive-card:nth-last-child(-n+3) {
+        .archive-grid .archive-card:nth-last-child(-n+4) {
             border-bottom: none;
         }
 
         .archive-card:hover {
-            background: var(--faint);
+            background: var(--ink);
+            color: var(--paper);
         }
 
         .archive-card-name {
             font-family: 'Bebas Neue', sans-serif;
             font-size: 1.25rem;
             letter-spacing: 0.04em;
-            transition: color 0.15s;
+            padding-right: 1.5rem;
         }
 
         .archive-card:hover .archive-card-name {
-            color: var(--accent);
+            color: var(--accent2);
         }
 
         .archive-card-meta {
-            font-size: 0.65rem;
+            font-size: 0.72rem;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            opacity: 0.4;
+            opacity: 0.65;
         }
 
         .archive-card-arrow {
@@ -919,13 +1358,39 @@
             top: 1.2rem;
             right: 1.4rem;
             font-size: 1rem;
-            opacity: 0.2;
-            transition: opacity 0.18s, transform 0.18s;
+            opacity: 0.4;
+            transition: opacity 0.18s, transform 0.3s var(--ease-out);
         }
 
         .archive-card:hover .archive-card-arrow {
-            opacity: 0.8;
+            opacity: 1;
             transform: translate(3px, -3px);
+        }
+
+        /* ── FAIXA GIGANTE ANTES DO CONTATO ── */
+        .band {
+            overflow: hidden;
+            border-bottom: 2px solid var(--ink);
+            padding: 1.5rem 0;
+            background: var(--paper);
+        }
+
+        .band-row {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(4rem, 11vw, 10rem);
+            line-height: 0.95;
+            white-space: nowrap;
+            will-change: transform;
+        }
+
+        .band-row.outline {
+            color: transparent;
+            -webkit-text-stroke: 2px var(--ink);
+        }
+
+        .band-row.solid {
+            color: var(--accent);
+            margin-left: -30vw;
         }
 
         /* ── SEÇÃO CONTATO ── */
@@ -942,11 +1407,13 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            gap: 2rem;
         }
 
         .contact-headline {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(3.5rem, 6vw, 6.5rem);
+            font-weight: 400;
+            font-size: clamp(3.5rem, 6vw, 6rem);
             color: var(--ink);
             line-height: 0.92;
             letter-spacing: -0.01em;
@@ -962,9 +1429,8 @@
             font-style: italic;
             font-size: 1.1rem;
             color: var(--ink);
-            opacity: 0.7;
             line-height: 1.7;
-            max-width: 340px;
+            max-width: 36ch;
         }
 
         .contact-right {
@@ -980,11 +1446,12 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 1rem;
             padding: 1.5rem 0;
             border-bottom: 1.5px solid var(--ink);
             text-decoration: none;
             color: var(--ink);
-            transition: padding-left 0.2s;
+            transition: padding-left 0.4s var(--ease-out);
         }
 
         .contact-link:first-child {
@@ -992,37 +1459,39 @@
         }
 
         .contact-link:hover {
-            padding-left: 0.5rem;
+            padding-left: 0.8rem;
         }
 
         .contact-link-inner {
             display: flex;
             flex-direction: column;
             gap: 0.2rem;
+            min-width: 0;
         }
 
         .contact-link-type {
-            font-size: 0.62rem;
+            font-size: 0.7rem;
             letter-spacing: 0.18em;
             text-transform: uppercase;
-            opacity: 0.35;
+            opacity: 0.65;
         }
 
         .contact-link-value {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.3rem;
+            font-size: clamp(1.2rem, 2vw, 1.6rem);
             letter-spacing: 0.06em;
+            overflow-wrap: anywhere;
             transition: color 0.15s;
         }
 
         .contact-link:hover .contact-link-value {
-            color: var(--blue);
+            color: var(--accent-ink);
         }
 
         .contact-link-arrow {
             font-size: 1.4rem;
-            opacity: 0.3;
-            transition: opacity 0.15s, transform 0.15s;
+            opacity: 0.5;
+            transition: opacity 0.15s, transform 0.3s var(--ease-out);
         }
 
         .contact-link:hover .contact-link-arrow {
@@ -1040,7 +1509,7 @@
             gap: 1rem;
             flex-wrap: wrap;
             padding: 1.5rem 2.5rem;
-            font-size: 0.68rem;
+            font-size: 0.74rem;
             letter-spacing: 0.12em;
             text-transform: uppercase;
         }
@@ -1052,22 +1521,21 @@
 
         footer a:hover {
             text-decoration: underline;
+            text-underline-offset: 3px;
         }
 
-        /* ── ANIMAÇÃO DE REVELAÇÃO (JS) ── */
-        .reveal {
+        /* ── ESTADO INICIAL DA ENTRADA (SÓ QUANDO O JS VAI ANIMAR) ── */
+        .js .hero-name .line > span {
+            transform: translateY(105%);
+        }
+
+        .js .hero-intro {
             opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.65s ease, transform 0.65s ease;
-        }
-
-        .reveal.in {
-            opacity: 1;
-            transform: none;
         }
 
         /* ── TRANSIÇÃO DE IDIOMA ── */
-        [data-i18n] {
+        /* só durante a troca, para não brigar com as animações do GSAP */
+        .lang-anim [data-i18n] {
             transition: opacity 0.18s ease;
         }
 
@@ -1083,18 +1551,53 @@
 
             .marquee-track,
             .hero-tag-dot,
-            .status-badge::before {
+            .status-badge::before,
+            .showcase-label::before,
+            .terminal .t-caret {
                 animation: none;
             }
 
-            .reveal {
-                opacity: 1;
+            .js .hero-name .line > span {
                 transform: none;
-                transition: none;
+            }
+
+            .js .hero-intro {
+                opacity: 1;
             }
         }
 
         /* ── RESPONSIVIDADE ── */
+        @media (max-width: 1100px) {
+            .project-row {
+                grid-template-columns: 120px 1fr minmax(240px, 36%);
+            }
+
+            .project-index {
+                padding: 2.5rem 1.5rem;
+                font-size: 2.6rem;
+            }
+
+            .archive-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .archive-grid .archive-card:nth-child(4n) {
+                border-right: 2px solid var(--ink);
+            }
+
+            .archive-grid .archive-card:nth-child(2n) {
+                border-right: none;
+            }
+
+            .archive-grid .archive-card:nth-last-child(-n+4) {
+                border-bottom: 2px solid var(--ink);
+            }
+
+            .archive-grid .archive-card:nth-last-child(-n+2) {
+                border-bottom: none;
+            }
+        }
+
         @media (max-width: 900px) {
             #hero, #contact {
                 grid-template-columns: 1fr;
@@ -1103,29 +1606,20 @@
             .hero-left {
                 border-right: none;
                 border-bottom: 2px solid var(--ink);
-                padding: 4rem 1.5rem 3rem;
+                padding: 3rem 1.5rem 2.5rem;
+                gap: 2.2rem;
             }
 
             .hero-right {
-                min-height: auto;
-                padding: 3rem 1.5rem;
-                display: flex;
-                flex-direction: column;
-                gap: 2.5rem;
+                padding: 3rem 1.5rem 2.5rem;
             }
 
-            .hero-info-box {
-                position: relative;
-                top: 0;
-                left: 0;
-                right: 0;
+            .browser {
+                box-shadow: 6px 6px 0 var(--ink);
             }
 
-            .hero-accent-block {
-                position: relative;
-                bottom: 0;
-                left: 0;
-                align-self: flex-start;
+            .sticker {
+                right: -0.3rem;
             }
 
             #about {
@@ -1162,7 +1656,20 @@
             .skills-header-left {
                 border-right: none;
                 border-bottom: 2px solid rgba(255, 255, 255, 0.12);
-                padding: 1.5rem 2rem;
+                padding: 1.5rem;
+            }
+
+            .skills-header-right,
+            .projects-header-right {
+                padding: 2rem 1.5rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.8rem;
+            }
+
+            .skills-sub,
+            .projects-sub {
+                text-align: left;
             }
 
             .skills-grid {
@@ -1170,7 +1677,12 @@
             }
 
             .skill-col {
+                padding: 2rem 1.5rem;
                 border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+            }
+
+            .skill-col:nth-child(2n) {
+                border-right: none;
             }
 
             .skills-radar {
@@ -1187,34 +1699,25 @@
                 padding: 1.5rem;
             }
 
-            .projects-header-right {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.8rem;
-            }
-
-            .projects-sub {
-                text-align: left;
-            }
-
             .project-row {
-                grid-template-columns: 60px 1fr;
+                grid-template-columns: 1fr;
             }
 
             .project-index {
-                padding: 1.2rem;
-                font-size: 1.5rem;
-                align-items: flex-start;
+                border-right: none;
+                padding: 1.5rem 1.5rem 0;
+                font-size: 2.2rem;
             }
 
             .project-body {
-                padding: 1.5rem 1.5rem 0.5rem 1rem;
+                padding: 0.8rem 1.5rem 1.5rem;
+                order: 1;
             }
 
-            .project-actions {
-                grid-column: 2;
-                flex-direction: row;
-                padding: 0 1.5rem 1.5rem 1rem;
+            .project-media {
+                padding: 0 1.5rem;
+                order: 0;
+                margin-top: 1rem;
             }
 
             .archive-header {
@@ -1222,19 +1725,6 @@
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 0.6rem;
-            }
-
-            .archive-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .archive-grid .archive-card {
-                border-right: none;
-                border-bottom: 2px solid var(--ink);
-            }
-
-            .archive-grid .archive-card:last-child {
-                border-bottom: none;
             }
 
             .contact-left {
@@ -1248,31 +1738,74 @@
             }
 
             nav {
-                grid-template-columns: 1fr auto;
+                grid-template-columns: auto 1fr;
+                padding: 0 1.5rem;
             }
 
             .nav-left {
                 display: none;
             }
 
+            .nav-logo {
+                text-align: left;
+            }
+
             .nav-right {
                 gap: 1.2rem;
+            }
+
+            footer {
+                padding: 1.5rem;
             }
         }
 
         @media (max-width: 600px) {
-            .nav-right a {
+            .nav-link[href="#about"],
+            .nav-link[href="#skills"] {
                 display: none;
             }
 
-            .hero-bottom {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1.5rem;
+            .hero-name {
+                font-size: clamp(3.8rem, 21vw, 6rem);
             }
 
-            .project-actions {
-                flex-wrap: wrap;
+            .hero-actions .btn {
+                flex: 1 1 auto;
+                justify-content: center;
+            }
+
+            .show-tabs {
+                gap: 0.35rem;
+            }
+
+            .show-tab {
+                font-size: 0;
+                min-height: 32px;
+            }
+
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .skill-col {
+                border-right: none;
+            }
+
+            .archive-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .archive-grid .archive-card {
+                border-right: none !important;
+                border-bottom: 2px solid var(--ink) !important;
+            }
+
+            .archive-grid .archive-card:last-child {
+                border-bottom: none !important;
+            }
+
+            .terminal {
+                font-size: 0.66rem;
             }
         }
     </style>
@@ -1293,12 +1826,12 @@
 
     <nav>
         <div class="nav-left" data-i18n="nav.location">São Paulo, BR · 2026</div>
-        <div class="nav-logo">IGT</div>
+        <a class="nav-logo" href="#hero" aria-label="Igor Grave Teixeira — início">IGT</a>
         <div class="nav-right">
-            <a href="#about"    data-i18n="nav.about">Sobre</a>
-            <a href="#skills"   data-i18n="nav.skills">Skills</a>
-            <a href="#projects" data-i18n="nav.projects">Projetos</a>
-            <a href="#contact"  data-i18n="nav.contact">Contato</a>
+            <a class="nav-link" href="#about"    data-i18n="nav.about">Sobre</a>
+            <a class="nav-link" href="#skills"   data-i18n="nav.skills">Skills</a>
+            <a class="nav-link" href="#projects" data-i18n="nav.projects">Projetos</a>
+            <a class="nav-link" href="#contact"  data-i18n="nav.contact">Contato</a>
             <!-- BOTÃO DE IDIOMA -->
             <div class="lang-toggle" id="langToggle" role="group" aria-label="Selecionar idioma / Select language">
                 <button class="lang-opt active" data-lang="pt" onclick="setLang('pt')">PT</button>
@@ -1306,63 +1839,93 @@
                 <button class="lang-opt"        data-lang="en" onclick="setLang('en')">EN</button>
             </div>
         </div>
+        <div class="scroll-progress" aria-hidden="true"></div>
     </nav>
 
-    <section id="hero">
+    <section id="hero" tabindex="-1">
         <div class="hero-left">
             <div>
-                <div class="hero-tag">
+                <div class="hero-tag hero-intro">
                     <span class="hero-tag-dot"></span>
-                    <span data-i18n="hero.tag">Aberto a oportunidades</span>
+                    <span data-i18n="hero.tag">Aberto a estágio e vaga júnior</span>
                 </div>
                 <h1 class="hero-name">
-                    Igor<br>
-                    <span class="stroke">Grave</span><br>
-                    Teixeira
+                    <span class="line"><span>Igor</span></span>
+                    <span class="line"><span class="stroke">Grave</span></span>
+                    <span class="line"><span>Teixeira</span></span>
                 </h1>
+                <p class="hero-lead hero-intro" data-i18n="hero.lead">Desenvolvedor fullstack. Eu crio sites e sistemas completos — <em>e coloco no ar.</em></p>
+                <p class="hero-desc hero-intro" data-i18n="hero.desc">Do visual à API, banco de dados e deploy. Estudo Engenharia de Software na FIAP e já entreguei sites para clientes reais, além de apps web e mobile.</p>
             </div>
-            <div class="hero-bottom">
-                <p class="hero-desc" data-i18n="hero.desc">Desenvolvedor fullstack: construo produtos de ponta a ponta — interface, API, banco de dados e deploy. Sites de clientes no ar, aplicações web e mobile, backend em Java e Node, e código feito para durar.</p>
-                <a href="#projects" class="btn-hero" data-i18n="hero.cta">Ver projetos ↗</a>
+            <div class="hero-intro">
+                <div class="hero-actions">
+                    <a href="#projects" class="btn btn-primary magnetic" data-i18n="hero.cta">Ver projetos ↓</a>
+                    <a href="#contact" class="btn btn-ghost magnetic" data-i18n="hero.cta2">Falar comigo</a>
+                </div>
+                <div class="hero-proof" data-i18n="hero.proof"><span>2 clientes reais</span><span>Web + mobile</span><span>Java · Node · TypeScript</span></div>
             </div>
         </div>
+
+        <!-- VITRINE: prints reais dos projetos que estão no ar -->
         <div class="hero-right">
-            <div class="hero-big-num">26</div>
-            <div class="hero-info-box">
-                <div class="info-row">
-                    <span class="info-label" data-i18n="hero.info.roleLabel">Função</span>
-                    <span class="info-value"  data-i18n="hero.info.roleValue">Fullstack / Backend Dev</span>
+            <div class="showcase hero-intro" id="showcase">
+                <div class="showcase-label" data-i18n="hero.showLabel">No ar agora — clique para abrir</div>
+                <div class="browser">
+                    <span class="sticker" data-i18n="hero.available">2 sites de clientes no ar</span>
+                    <div class="browser-bar" aria-hidden="true">
+                        <span class="browser-dots"><i></i><i></i><i></i></span>
+                        <span class="browser-url">cotseguro.com.br</span>
+                    </div>
+                    <div class="browser-view">
+                        <a class="slide is-active" href="https://www.cotseguro.com.br/" target="_blank" rel="noopener" data-url="cotseguro.com.br">
+                            <img src="assets/cotseguro.webp" width="1200" height="750" alt="Página inicial do site da Cotseguro" data-i18n-alt="alt.cotseguro" />
+                        </a>
+                        <a class="slide" href="https://vet-thabata-site.vercel.app" target="_blank" rel="noopener" data-url="vet-thabata-site.vercel.app">
+                            <img src="assets/vet.webp" width="1200" height="750" alt="Página inicial do site da Vet Thata" data-i18n-alt="alt.vet" />
+                        </a>
+                        <a class="slide" href="https://family-finance-web-eta.vercel.app" target="_blank" rel="noopener" data-url="family-finance-web-eta.vercel.app">
+                            <img src="assets/family.webp" width="1200" height="750" alt="Tela de entrada do app Family Finance" data-i18n-alt="alt.family" />
+                        </a>
+                        <a class="slide" href="https://site-farmaco.vercel.app" target="_blank" rel="noopener" data-url="site-farmaco.vercel.app">
+                            <img src="assets/farma.webp" width="1200" height="750" alt="Tela de acesso do sistema de gestão farmacêutica" data-i18n-alt="alt.farma" />
+                        </a>
+                        <a class="slide" href="https://semente-case-b3.vercel.app" target="_blank" rel="noopener" data-url="semente-case-b3.vercel.app">
+                            <img src="assets/invest.webp" width="1200" height="750" alt="Tela inicial do protótipo InvestStart" data-i18n-alt="alt.invest" />
+                        </a>
+                    </div>
                 </div>
-                <div class="info-row">
-                    <span class="info-label" data-i18n="hero.info.degreeLabel">Graduação</span>
-                    <span class="info-value"  data-i18n="hero.info.degreeValue">Eng. de Software · FIAP</span>
+                <div class="showcase-caps">
+                    <p class="show-cap is-active"><strong>Cotseguro</strong><span data-i18n="projects.cotseguro.tagline">Site oficial de uma corretora de seguros de carga.</span></p>
+                    <p class="show-cap"><strong>Vet Thata</strong><span data-i18n="projects.vet.tagline">Site de uma veterinária a domicílio, com agendamento pelo WhatsApp.</span></p>
+                    <p class="show-cap"><strong>Family Finance</strong><span data-i18n="projects.family.tagline">App para a família controlar os gastos — no navegador ou no celular.</span></p>
+                    <p class="show-cap"><strong data-i18n="projects.pharma.short">Gestão Farma</strong><span data-i18n="projects.pharma.tagline">Sistema de gestão para distribuidoras de medicamentos.</span></p>
+                    <p class="show-cap"><strong>InvestStart</strong><span data-i18n="projects.invest.tagline">Protótipo que mostra, na prática, por que investir vale mais que apostar.</span></p>
                 </div>
-                <div class="info-row">
-                    <span class="info-label" data-i18n="hero.info.locationLabel">Localização</span>
-                    <span class="info-value"  data-i18n="hero.info.locationValue">São Paulo, Brasil</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label" data-i18n="hero.info.focusLabel">Foco atual</span>
-                    <span class="info-value"  data-i18n="hero.info.focusValue">APIs · Arquitetura · Cloud</span>
+                <div class="show-tabs">
+                    <button class="show-toggle" type="button" aria-pressed="false" aria-label="Pausar troca automática / Pause autoplay">❚❚</button>
+                    <button class="show-tab" type="button" aria-current="true"><span class="fill"></span>Cotseguro</button>
+                    <button class="show-tab" type="button"><span class="fill"></span>Vet Thata</button>
+                    <button class="show-tab" type="button"><span class="fill"></span>Family Finance</button>
+                    <button class="show-tab" type="button"><span class="fill"></span><span data-i18n="projects.pharma.short">Gestão Farma</span></button>
+                    <button class="show-tab" type="button"><span class="fill"></span>InvestStart</button>
                 </div>
             </div>
-            <div class="hero-accent-block" data-i18n="hero.available">2 sites de clientes no ar</div>
         </div>
     </section>
 
-    <section id="about">
+    <section id="about" tabindex="-1">
         <div class="about-sidebar">
             <div class="section-num">01</div>
             <div class="section-tag" data-i18n="about.sideTag">Sobre mim</div>
         </div>
         <div class="about-body">
-            <h2 class="about-title reveal" data-i18n="about.title">Menos promessa,<br><em>mais produção.</em></h2>
+            <h2 class="about-title reveal-title" data-i18n="about.title">Menos promessa,<br><em>mais produção.</em></h2>
             <div class="about-cols">
-                <div class="about-text reveal">
+                <div class="about-text fade">
                     <p data-i18n="about.p1">Sou Igor Grave Teixeira, estudante de Engenharia de Software na FIAP e desenvolvedor fullstack em São Paulo. Enquanto curso a graduação, já entrego software de verdade: sites institucionais para clientes reais rodando em produção, sistemas em Java e interfaces que funcionam em qualquer tela.</p>
                     <p data-i18n="about.p2">Acredito que bom código é legível, testável e pronto para crescer — e que a melhor forma de aprender é colocando coisas no ar. Tudo que está aqui é público: código aberto, histórico de commits e deploy funcionando. Pode conferir.</p>
                 </div>
-                <div class="about-facts reveal">
+                <div class="about-facts fade">
                     <div class="fact">
                         <span class="fact-label" data-i18n="about.fact.uniLabel">Universidade</span>
                         <span class="fact-value">FIAP</span>
@@ -1377,7 +1940,7 @@
                     </div>
                     <div class="fact">
                         <span class="fact-label" data-i18n="about.fact.liveLabel">Projetos no ar</span>
-                        <span class="fact-value accent">6</span>
+                        <span class="fact-value accent count" data-to="6">6</span>
                     </div>
                     <div class="fact">
                         <span class="fact-label" data-i18n="about.fact.statusLabel">Status</span>
@@ -1388,41 +1951,38 @@
         </div>
     </section>
 
-    <section id="skills">
+    <section id="skills" tabindex="-1">
         <div class="skills-header">
             <div class="skills-header-left">
                 <div class="section-num">02</div>
             </div>
             <div class="skills-header-right">
-                <h2 class="skills-title reveal" data-i18n="skills.title">Stack técnica.</h2>
+                <h2 class="skills-title reveal-title" data-i18n="skills.title">Stack técnica.</h2>
+                <p class="skills-sub fade" data-i18n="skills.sub">O que eu uso no dia a dia — e o que estou estudando agora.</p>
             </div>
         </div>
         <div class="skills-grid">
-            <div class="skill-col reveal">
-                <div class="skill-col-icon">⚙️</div>
+            <div class="skill-col">
                 <div class="skill-col-name" data-i18n="skills.backend">Backend</div>
                 <ul class="skill-list">
                     <li>Java</li><li>Node.js</li><li>Express.js</li>
                     <li>REST APIs</li><li>Python</li>
                 </ul>
             </div>
-            <div class="skill-col reveal">
-                <div class="skill-col-icon">🖥️</div>
+            <div class="skill-col">
                 <div class="skill-col-name" data-i18n="skills.frontend">Frontend</div>
                 <ul class="skill-list">
                     <li>JavaScript</li><li>HTML5 / CSS3</li><li>Tailwind CSS</li>
                     <li>TypeScript</li><li data-i18n="skills.responsive">Design responsivo</li>
                 </ul>
             </div>
-            <div class="skill-col reveal">
-                <div class="skill-col-icon">🗄️</div>
+            <div class="skill-col">
                 <div class="skill-col-name" data-i18n="skills.database">Banco de Dados</div>
                 <ul class="skill-list">
                     <li>SQL</li><li>MySQL</li><li>PostgreSQL</li><li>MongoDB</li>
                 </ul>
             </div>
-            <div class="skill-col reveal">
-                <div class="skill-col-icon">🛠️</div>
+            <div class="skill-col">
                 <div class="skill-col-name" data-i18n="skills.tools">Ferramentas</div>
                 <ul class="skill-list">
                     <li>Git &amp; GitHub</li><li data-i18n="skills.vercel">Vercel (deploy)</li>
@@ -1430,8 +1990,8 @@
                 </ul>
             </div>
         </div>
-        <div class="skills-radar reveal">
-            <span class="radar-label" data-i18n="skills.radarLabel">No radar agora →</span>
+        <div class="skills-radar fade">
+            <span class="radar-label" data-i18n="skills.radarLabel">Estudando agora →</span>
             <span class="radar-item">Spring Boot</span>
             <span class="radar-item">React</span>
             <span class="radar-item">Next.js</span>
@@ -1440,25 +2000,26 @@
         </div>
     </section>
 
-    <section id="projects">
+    <section id="projects" tabindex="-1">
         <div class="projects-header">
             <div class="projects-header-left">
                 <div class="section-num">03</div>
             </div>
             <div class="projects-header-right">
-                <h2 class="projects-title reveal" data-i18n="projects.title">Projetos.</h2>
-                <p class="projects-sub reveal" data-i18n="projects.sub">Não é mockup nem tutorial: é código público com deploy rodando agora.</p>
+                <h2 class="projects-title reveal-title" data-i18n="projects.title">Projetos.</h2>
+                <p class="projects-sub fade" data-i18n="projects.sub">Não é mockup nem tutorial: é código público com deploy rodando agora.</p>
             </div>
         </div>
 
         <!-- 01 — FAMILY FINANCE (FULLSTACK) -->
-        <div class="project-row reveal">
+        <article class="project-row">
             <div class="project-index">01</div>
             <div class="project-body">
                 <div class="project-name-row">
                     <h3 class="project-name" data-i18n="projects.family.name">Family Finance — Controle de Gastos</h3>
                     <span class="status-badge" data-i18n="projects.liveBadge">No ar</span>
                 </div>
+                <p class="project-tagline" data-i18n="projects.family.tagline">App para a família controlar os gastos — no navegador ou no celular.</p>
                 <p class="project-desc" data-i18n="projects.family.desc">Aplicação fullstack em monorepo para controlar gastos da família: API em Fastify + Prisma + PostgreSQL com testes, web instalável como app (PWA) e app nativo Android/iOS em React Native. Todo valor em dinheiro é inteiro em centavos — nenhum float toca cálculo monetário.</p>
                 <div class="project-tags">
                     <span class="project-tag">TypeScript</span>
@@ -1468,15 +2029,20 @@
                     <span class="project-tag">React Native</span>
                     <span class="project-tag">PWA</span>
                 </div>
+                <div class="project-actions">
+                    <a class="project-link primary" href="https://family-finance-web-eta.vercel.app" target="_blank" rel="noopener" data-i18n="projects.viewSite">Ver site ↗</a>
+                    <a class="project-link" href="https://github.com/graveigor/familyfinance" target="_blank" rel="noopener" data-i18n="projects.viewCode">Código ↗</a>
+                </div>
             </div>
-            <div class="project-actions">
-                <a class="project-link primary" href="https://app-controlegastos-web-eta.vercel.app" target="_blank" rel="noopener" data-i18n="projects.viewSite">Ver site ↗</a>
-                <a class="project-link" href="https://github.com/graveigor/familyfinance" target="_blank" rel="noopener" data-i18n="projects.viewCode">Código ↗</a>
+            <div class="project-media">
+                <a class="project-thumb" href="https://family-finance-web-eta.vercel.app" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
+                    <img src="assets/family.webp" width="1200" height="750" alt="" loading="lazy" />
+                </a>
             </div>
-        </div>
+        </article>
 
         <!-- 02 — COTSEGURO (CLIENTE REAL) -->
-        <div class="project-row reveal">
+        <article class="project-row">
             <div class="project-index">02</div>
             <div class="project-body">
                 <div class="project-name-row">
@@ -1484,6 +2050,7 @@
                     <span class="client-badge" data-i18n="projects.clientBadge">Cliente real</span>
                     <span class="status-badge" data-i18n="projects.liveBadge">No ar</span>
                 </div>
+                <p class="project-tagline" data-i18n="projects.cotseguro.tagline">Site oficial de uma corretora de seguros de carga.</p>
                 <p class="project-desc" data-i18n="projects.cotseguro.desc">Site institucional completo para corretora de seguros de transporte: 4 páginas, formulário de cotação, menu mobile e animações. Entregue, publicado e em uso pelo cliente.</p>
                 <div class="project-tags">
                     <span class="project-tag">HTML5</span>
@@ -1491,21 +2058,27 @@
                     <span class="project-tag">JavaScript</span>
                     <span class="project-tag">Vercel</span>
                 </div>
+                <div class="project-actions">
+                    <a class="project-link primary" href="https://www.cotseguro.com.br/" target="_blank" rel="noopener" data-i18n="projects.viewSite">Ver site ↗</a>
+                    <a class="project-link" href="https://github.com/graveigor/cotseguro-site" target="_blank" rel="noopener" data-i18n="projects.viewCode">Código ↗</a>
+                </div>
             </div>
-            <div class="project-actions">
-                <a class="project-link primary" href="https://www.cotseguro.com.br/" target="_blank" rel="noopener" data-i18n="projects.viewSite">Ver site ↗</a>
-                <a class="project-link" href="https://github.com/graveigor/cotseguro-site" target="_blank" rel="noopener" data-i18n="projects.viewCode">Código ↗</a>
+            <div class="project-media">
+                <a class="project-thumb" href="https://www.cotseguro.com.br/" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
+                    <img src="assets/cotseguro.webp" width="1200" height="750" alt="" loading="lazy" />
+                </a>
             </div>
-        </div>
+        </article>
 
         <!-- 03 — GESTÃO FARMACÊUTICA -->
-        <div class="project-row reveal">
+        <article class="project-row">
             <div class="project-index">03</div>
             <div class="project-body">
                 <div class="project-name-row">
                     <h3 class="project-name" data-i18n="projects.pharma.name">Gestão de Distribuição Farmacêutica</h3>
                     <span class="status-badge" data-i18n="projects.liveBadge">No ar</span>
                 </div>
+                <p class="project-tagline" data-i18n="projects.pharma.tagline">Sistema de gestão para distribuidoras de medicamentos.</p>
                 <p class="project-desc" data-i18n="projects.pharma.desc">Plataforma de gestão para distribuição farmacêutica, com React 19 no front e Express + tRPC no back — tipagem end-to-end do banco até a tela. Módulo de Pedidos da Indústria funcional.</p>
                 <div class="project-tags">
                     <span class="project-tag">React 19</span>
@@ -1513,15 +2086,20 @@
                     <span class="project-tag">tRPC</span>
                     <span class="project-tag">Express</span>
                 </div>
+                <div class="project-actions">
+                    <a class="project-link primary" href="https://site-farmaco.vercel.app" target="_blank" rel="noopener" data-i18n="projects.viewSite">Ver site ↗</a>
+                    <a class="project-link" href="https://github.com/graveigor/site-farmaco" target="_blank" rel="noopener" data-i18n="projects.viewCode">Código ↗</a>
+                </div>
             </div>
-            <div class="project-actions">
-                <a class="project-link primary" href="https://site-farmaco.vercel.app" target="_blank" rel="noopener" data-i18n="projects.viewSite">Ver site ↗</a>
-                <a class="project-link" href="https://github.com/graveigor/site-farmaco" target="_blank" rel="noopener" data-i18n="projects.viewCode">Código ↗</a>
+            <div class="project-media">
+                <a class="project-thumb" href="https://site-farmaco.vercel.app" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
+                    <img src="assets/farma.webp" width="1200" height="750" alt="" loading="lazy" />
+                </a>
             </div>
-        </div>
+        </article>
 
         <!-- 04 — VET THATA (CLIENTE REAL) -->
-        <div class="project-row reveal">
+        <article class="project-row">
             <div class="project-index">04</div>
             <div class="project-body">
                 <div class="project-name-row">
@@ -1529,6 +2107,7 @@
                     <span class="client-badge" data-i18n="projects.clientBadge">Cliente real</span>
                     <span class="status-badge" data-i18n="projects.liveBadge">No ar</span>
                 </div>
+                <p class="project-tagline" data-i18n="projects.vet.tagline">Site de uma veterinária a domicílio, com agendamento pelo WhatsApp.</p>
                 <p class="project-desc" data-i18n="projects.vet.desc">Site de 6 páginas para médica-veterinária: serviços, vitrine de produtos e agendamento integrado com WhatsApp e Google Agenda. Configuração centralizada em JS para o cliente atualizar tudo num lugar só.</p>
                 <div class="project-tags">
                     <span class="project-tag">HTML5</span>
@@ -1536,21 +2115,27 @@
                     <span class="project-tag">JavaScript</span>
                     <span class="project-tag" data-i18n="projects.vet.tagIntegration">Integração WhatsApp</span>
                 </div>
+                <div class="project-actions">
+                    <a class="project-link primary" href="https://vet-thabata-site.vercel.app" target="_blank" rel="noopener" data-i18n="projects.viewSite">Ver site ↗</a>
+                    <a class="project-link" href="https://github.com/graveigor/vet_thabata_site" target="_blank" rel="noopener" data-i18n="projects.viewCode">Código ↗</a>
+                </div>
             </div>
-            <div class="project-actions">
-                <a class="project-link primary" href="https://vet-thabata-site.vercel.app" target="_blank" rel="noopener" data-i18n="projects.viewSite">Ver site ↗</a>
-                <a class="project-link" href="https://github.com/graveigor/vet_thabata_site" target="_blank" rel="noopener" data-i18n="projects.viewCode">Código ↗</a>
+            <div class="project-media">
+                <a class="project-thumb" href="https://vet-thabata-site.vercel.app" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
+                    <img src="assets/vet.webp" width="1200" height="750" alt="" loading="lazy" />
+                </a>
             </div>
-        </div>
+        </article>
 
         <!-- 05 — INVESTSTART (CASE B3) -->
-        <div class="project-row reveal">
+        <article class="project-row">
             <div class="project-index">05</div>
             <div class="project-body">
                 <div class="project-name-row">
                     <h3 class="project-name">InvestStart — Case B3</h3>
                     <span class="status-badge" data-i18n="projects.liveBadge">No ar</span>
                 </div>
+                <p class="project-tagline" data-i18n="projects.invest.tagline">Protótipo que mostra, na prática, por que investir vale mais que apostar.</p>
                 <p class="project-desc" data-i18n="projects.invest.desc">Protótipo de micro investimento para o case da B3: educação gamificada, simulador que compara apostar com investir, e primeiro investimento assistido. Gráficos desenhados em SVG puro, sem nenhuma biblioteca de charts.</p>
                 <div class="project-tags">
                     <span class="project-tag">React 19</span>
@@ -1558,20 +2143,26 @@
                     <span class="project-tag">Vite</span>
                     <span class="project-tag">SVG</span>
                 </div>
+                <div class="project-actions">
+                    <a class="project-link primary" href="https://semente-case-b3.vercel.app" target="_blank" rel="noopener" data-i18n="projects.viewSite">Ver site ↗</a>
+                    <a class="project-link" href="https://github.com/graveigor/semente-case-b3" target="_blank" rel="noopener" data-i18n="projects.viewCode">Código ↗</a>
+                </div>
             </div>
-            <div class="project-actions">
-                <a class="project-link primary" href="https://semente-case-b3.vercel.app" target="_blank" rel="noopener" data-i18n="projects.viewSite">Ver site ↗</a>
-                <a class="project-link" href="https://github.com/graveigor/semente-case-b3" target="_blank" rel="noopener" data-i18n="projects.viewCode">Código ↗</a>
+            <div class="project-media">
+                <a class="project-thumb" href="https://semente-case-b3.vercel.app" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
+                    <img src="assets/invest.webp" width="1200" height="750" alt="" loading="lazy" />
+                </a>
             </div>
-        </div>
+        </article>
 
         <!-- 06 — SISTEMA BANCÁRIO JAVA -->
-        <div class="project-row reveal">
+        <article class="project-row">
             <div class="project-index">06</div>
             <div class="project-body">
                 <div class="project-name-row">
                     <h3 class="project-name" data-i18n="projects.bank.name">Sistema Bancário em Java</h3>
                 </div>
+                <p class="project-tagline" data-i18n="projects.bank.tagline">Simulador de conta bancária que roda no terminal.</p>
                 <p class="project-desc" data-i18n="projects.bank.desc">Sistema de conta bancária via console: saldo, depósitos, transferências e validação de regras de negócio. Foco em lógica, fluxos de controle e organização de código em Java.</p>
                 <div class="project-tags">
                     <span class="project-tag">Java</span>
@@ -1579,54 +2170,70 @@
                     <span class="project-tag">Backend</span>
                     <span class="project-tag" data-i18n="projects.bank.tagLogic">Regras de negócio</span>
                 </div>
+                <div class="project-actions">
+                    <a class="project-link primary" href="https://github.com/graveigor/DesafioBancarioJava" target="_blank" rel="noopener" data-i18n="projects.viewCode">Código ↗</a>
+                </div>
             </div>
-            <div class="project-actions">
-                <a class="project-link primary" href="https://github.com/graveigor/DesafioBancarioJava" target="_blank" rel="noopener" data-i18n="projects.viewCode">Código ↗</a>
+            <div class="project-media">
+                <a class="project-thumb" href="https://github.com/graveigor/DesafioBancarioJava" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
+                    <div class="terminal" data-i18n="projects.bank.term"><span class="t-prompt">$</span> java DesafioBancario
+
+==========================
+  1 - Consultar saldo
+  2 - Receber valor
+  3 - Transferir valor
+  4 - Sair
+==========================
+<span class="t-prompt">&gt;</span> 3
+Valor: 1500
+<span class="t-ok">Saldo insuficiente.</span> Operação cancelada.
+<span class="t-prompt">&gt;</span> <span class="t-caret"></span></div>
+                </a>
             </div>
-        </div>
+        </article>
 
         <!-- ARQUIVO: MAIS PROJETOS -->
-        <div class="archive-header reveal">
+        <div class="archive-header">
             <span class="archive-title" data-i18n="projects.archiveTitle">+ Mais projetos no GitHub</span>
             <a class="archive-gh-link" href="https://github.com/graveigor?tab=repositories" target="_blank" rel="noopener" data-i18n="projects.archiveLink">Ver todos os repositórios ↗</a>
         </div>
         <div class="archive-grid">
-            <a class="archive-card reveal" href="https://fleurynho.vercel.app" target="_blank" rel="noopener">
+            <a class="archive-card" href="https://fleurynho.vercel.app" target="_blank" rel="noopener">
                 <span class="archive-card-name" data-i18n="projects.archive.sofiaName">Sofia — IA de atendimento</span>
                 <span class="archive-card-meta" data-i18n="projects.archive.sofiaMeta">JS · Tailwind · Acessibilidade</span>
                 <span class="archive-card-arrow" aria-hidden="true">↗</span>
             </a>
-            <a class="archive-card reveal" href="https://cp-4-front-end-inky.vercel.app" target="_blank" rel="noopener">
+            <a class="archive-card" href="https://cp-4-front-end-inky.vercel.app" target="_blank" rel="noopener">
                 <span class="archive-card-name">CP4 Front-End — FIAP</span>
                 <span class="archive-card-meta">HTML · CSS · JS</span>
                 <span class="archive-card-arrow" aria-hidden="true">↗</span>
             </a>
-            <a class="archive-card reveal" href="https://github.com/graveigor/Cp5_Front-End" target="_blank" rel="noopener">
+            <a class="archive-card" href="https://github.com/graveigor/Cp5_Front-End" target="_blank" rel="noopener">
                 <span class="archive-card-name">CP5 Front-End</span>
                 <span class="archive-card-meta">HTML · CSS · JS</span>
                 <span class="archive-card-arrow" aria-hidden="true">↗</span>
             </a>
-            <a class="archive-card reveal" href="https://github.com/graveigor/gs-frontend-webdev" target="_blank" rel="noopener">
+            <a class="archive-card" href="https://github.com/graveigor/gs-frontend-webdev" target="_blank" rel="noopener">
                 <span class="archive-card-name">Global Solution — FIAP</span>
                 <span class="archive-card-meta" data-i18n="projects.archive.gsMeta">Front-end · Em dupla</span>
                 <span class="archive-card-arrow" aria-hidden="true">↗</span>
             </a>
-            <a class="archive-card reveal" href="https://github.com/graveigor/Gabriella-portfolio" target="_blank" rel="noopener">
+            <a class="archive-card" href="https://github.com/graveigor/Gabriella-portfolio" target="_blank" rel="noopener">
                 <span class="archive-card-name" data-i18n="projects.archive.gabiName">Portfolio para cliente</span>
                 <span class="archive-card-meta">HTML · CSS · JS</span>
                 <span class="archive-card-arrow" aria-hidden="true">↗</span>
             </a>
-            <a class="archive-card reveal" href="https://github.com/graveigor/DesafioFilmeJava" target="_blank" rel="noopener">
+            <a class="archive-card" href="https://github.com/graveigor/DesafioFilmeJava" target="_blank" rel="noopener">
                 <span class="archive-card-name" data-i18n="projects.archive.filmeName">Desafio Filme — Java</span>
                 <span class="archive-card-meta">Java · POO</span>
                 <span class="archive-card-arrow" aria-hidden="true">↗</span>
             </a>
-            <a class="archive-card reveal" href="https://github.com/graveigor/rock_paper_scissors-Python" target="_blank" rel="noopener">
+            <a class="archive-card" href="https://github.com/graveigor/rock_paper_scissors-Python" target="_blank" rel="noopener">
                 <span class="archive-card-name">Rock Paper Scissors</span>
                 <span class="archive-card-meta" data-i18n="projects.archive.rpsMeta">Python · Lógica</span>
                 <span class="archive-card-arrow" aria-hidden="true">↗</span>
             </a>
-            <a class="archive-card reveal" href="https://github.com/graveigor/Jogo-do-n-mero-secreto" target="_blank" rel="noopener">
+            <a class="archive-card" href="https://github.com/graveigor/Jogo-do-n-mero-secreto" target="_blank" rel="noopener">
                 <span class="archive-card-name" data-i18n="projects.archive.jogoName">Jogo do Número Secreto</span>
                 <span class="archive-card-meta">JavaScript · DOM</span>
                 <span class="archive-card-arrow" aria-hidden="true">↗</span>
@@ -1634,29 +2241,35 @@
         </div>
     </section>
 
-    <section id="contact">
+    <!-- FAIXA GIGANTE: anda conforme o scroll -->
+    <div class="band" aria-hidden="true">
+        <div class="band-row outline" data-i18n="band.a">Estágio · Júnior · Freelance · Estágio · Júnior · Freelance ·</div>
+        <div class="band-row solid" data-i18n="band.b">Disponível agora · Disponível agora · Disponível agora ·</div>
+    </div>
+
+    <section id="contact" tabindex="-1">
         <div class="contact-left">
-            <h2 class="contact-headline reveal" data-i18n="contact.headline">Vamos<br><span class="ghost">construir</span><br>juntos?</h2>
-            <p class="contact-sub reveal" data-i18n="contact.sub">
+            <h2 class="contact-headline reveal-title" data-i18n="contact.headline">Vamos<br><span class="ghost">construir</span><br>juntos?</h2>
+            <p class="contact-sub fade" data-i18n="contact.sub">
                 Estágio, vaga júnior ou freelance — me chama. Eu respondo rápido e chego com código pronto para mostrar.
             </p>
         </div>
         <div class="contact-right">
-            <a href="mailto:igorgraveteixeira@gmail.com" class="contact-link reveal">
+            <a href="mailto:igorgraveteixeira@gmail.com" class="contact-link">
                 <div class="contact-link-inner">
                     <span class="contact-link-type">E-mail</span>
                     <span class="contact-link-value">igorgraveteixeira@gmail.com</span>
                 </div>
                 <span class="contact-link-arrow" aria-hidden="true">↗</span>
             </a>
-            <a href="https://github.com/graveigor" target="_blank" rel="noopener" class="contact-link reveal">
+            <a href="https://github.com/graveigor" target="_blank" rel="noopener" class="contact-link">
                 <div class="contact-link-inner">
                     <span class="contact-link-type">GitHub</span>
                     <span class="contact-link-value">github.com/graveigor</span>
                 </div>
                 <span class="contact-link-arrow" aria-hidden="true">↗</span>
             </a>
-            <a href="https://www.linkedin.com/in/igorgrave" target="_blank" rel="noopener" class="contact-link reveal">
+            <a href="https://www.linkedin.com/in/igorgrave" target="_blank" rel="noopener" class="contact-link">
                 <div class="contact-link-inner">
                     <span class="contact-link-type">LinkedIn</span>
                     <span class="contact-link-value">linkedin.com/in/igorgrave</span>
@@ -1668,8 +2281,13 @@
 
     <footer>
         <span data-i18n="footer.copy">© 2026 Igor Grave Teixeira</span>
-        <span data-i18n="footer.made">Feito do zero — HTML, CSS e JS puros, num único arquivo. <a href="https://github.com/graveigor/IgorGrave-portfolio" target="_blank" rel="noopener">Ver código ↗</a></span>
+        <span data-i18n="footer.made">Feito do zero — HTML, CSS e JS num único arquivo. <a href="https://github.com/graveigor/IgorGrave-portfolio" target="_blank" rel="noopener">Ver código ↗</a></span>
     </footer>
+
+    <!-- ANIMAÇÕES: GSAP + ScrollTrigger + Lenis (scroll suave). Se a CDN falhar, o site funciona sem elas. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
 
     <script>
         /* ────────────────────────────────────────────
@@ -1683,18 +2301,19 @@
                 'nav.skills':                 'Skills',
                 'nav.projects':               'Projetos',
                 'nav.contact':                'Contato',
-                'hero.tag':                   'Aberto a oportunidades',
-                'hero.desc':                  'Desenvolvedor fullstack: construo produtos de ponta a ponta — interface, API, banco de dados e deploy. Sites de clientes no ar, aplicações web e mobile, backend em Java e Node, e código feito para durar.',
-                'hero.cta':                   'Ver projetos ↗',
-                'hero.info.roleLabel':        'Função',
-                'hero.info.roleValue':        'Fullstack / Backend Dev',
-                'hero.info.degreeLabel':      'Graduação',
-                'hero.info.degreeValue':      'Eng. de Software · FIAP',
-                'hero.info.locationLabel':    'Localização',
-                'hero.info.locationValue':    'São Paulo, Brasil',
-                'hero.info.focusLabel':       'Foco atual',
-                'hero.info.focusValue':       'APIs · Arquitetura · Cloud',
+                'hero.tag':                   'Aberto a estágio e vaga júnior',
+                'hero.lead':                  'Desenvolvedor fullstack. Eu crio sites e sistemas completos — <em>e coloco no ar.</em>',
+                'hero.desc':                  'Do visual à API, banco de dados e deploy. Estudo Engenharia de Software na FIAP e já entreguei sites para clientes reais, além de apps web e mobile.',
+                'hero.cta':                   'Ver projetos ↓',
+                'hero.cta2':                  'Falar comigo',
+                'hero.proof':                 '<span>2 clientes reais</span><span>Web + mobile</span><span>Java · Node · TypeScript</span>',
+                'hero.showLabel':             'No ar agora — clique para abrir',
                 'hero.available':             '2 sites de clientes no ar',
+                'alt.cotseguro':              'Página inicial do site da Cotseguro',
+                'alt.vet':                    'Página inicial do site da Vet Thata',
+                'alt.family':                 'Tela de entrada do app Family Finance',
+                'alt.farma':                  'Tela de acesso do sistema de gestão farmacêutica',
+                'alt.invest':                 'Tela inicial do protótipo InvestStart',
                 'about.sideTag':              'Sobre mim',
                 'about.title':                'Menos promessa,<br><em>mais produção.</em>',
                 'about.p1':                   'Sou Igor Grave Teixeira, estudante de Engenharia de Software na FIAP e desenvolvedor fullstack em São Paulo. Enquanto curso a graduação, já entrego software de verdade: sites institucionais para clientes reais rodando em produção, sistemas em Java e interfaces que funcionam em qualquer tela.',
@@ -1707,6 +2326,7 @@
                 'about.fact.statusLabel':     'Status',
                 'about.fact.statusValue':     'Disponível ✓',
                 'skills.title':               'Stack técnica.',
+                'skills.sub':                 'O que eu uso no dia a dia — e o que estou estudando agora.',
                 'skills.backend':             'Backend',
                 'skills.frontend':            'Frontend',
                 'skills.database':            'Banco de Dados',
@@ -1714,23 +2334,31 @@
                 'skills.responsive':          'Design responsivo',
                 'skills.vercel':              'Vercel (deploy)',
                 'skills.docker':              'Docker (básico)',
-                'skills.radarLabel':          'No radar agora →',
+                'skills.radarLabel':          'Estudando agora →',
                 'projects.title':             'Projetos.',
                 'projects.sub':               'Não é mockup nem tutorial: é código público com deploy rodando agora.',
                 'projects.clientBadge':       'Cliente real',
                 'projects.liveBadge':         'No ar',
                 'projects.viewSite':          'Ver site ↗',
                 'projects.viewCode':          'Código ↗',
+                'projects.cotseguro.tagline': 'Site oficial de uma corretora de seguros de carga.',
                 'projects.cotseguro.desc':    'Site institucional completo para corretora de seguros de transporte: 4 páginas, formulário de cotação, menu mobile e animações. Entregue, publicado e em uso pelo cliente.',
+                'projects.vet.tagline':       'Site de uma veterinária a domicílio, com agendamento pelo WhatsApp.',
                 'projects.vet.desc':          'Site de 6 páginas para médica-veterinária: serviços, vitrine de produtos e agendamento integrado com WhatsApp e Google Agenda. Configuração centralizada em JS para o cliente atualizar tudo num lugar só.',
                 'projects.vet.tagIntegration':'Integração WhatsApp',
                 'projects.bank.name':         'Sistema Bancário em Java',
+                'projects.bank.tagline':      'Simulador de conta bancária que roda no terminal.',
                 'projects.bank.desc':         'Sistema de conta bancária via console: saldo, depósitos, transferências e validação de regras de negócio. Foco em lógica, fluxos de controle e organização de código em Java.',
                 'projects.bank.tagLogic':     'Regras de negócio',
+                'projects.bank.term':         '<span class="t-prompt">$</span> java DesafioBancario\n\n==========================\n  1 - Consultar saldo\n  2 - Receber valor\n  3 - Transferir valor\n  4 - Sair\n==========================\n<span class="t-prompt">&gt;</span> 3\nValor: 1500\n<span class="t-ok">Saldo insuficiente.</span> Operação cancelada.\n<span class="t-prompt">&gt;</span> <span class="t-caret"></span>',
                 'projects.family.name':       'Family Finance — Controle de Gastos',
+                'projects.family.tagline':    'App para a família controlar os gastos — no navegador ou no celular.',
                 'projects.family.desc':       'Aplicação fullstack em monorepo para controlar gastos da família: API em Fastify + Prisma + PostgreSQL com testes, web instalável como app (PWA) e app nativo Android/iOS em React Native. Todo valor em dinheiro é inteiro em centavos — nenhum float toca cálculo monetário.',
                 'projects.pharma.name':       'Gestão de Distribuição Farmacêutica',
+                'projects.pharma.short':      'Gestão Farma',
+                'projects.pharma.tagline':    'Sistema de gestão para distribuidoras de medicamentos.',
                 'projects.pharma.desc':       'Plataforma de gestão para distribuição farmacêutica, com React 19 no front e Express + tRPC no back — tipagem end-to-end do banco até a tela. Módulo de Pedidos da Indústria funcional.',
+                'projects.invest.tagline':    'Protótipo que mostra, na prática, por que investir vale mais que apostar.',
                 'projects.invest.desc':       'Protótipo de micro investimento para o case da B3: educação gamificada, simulador que compara apostar com investir, e primeiro investimento assistido. Gráficos desenhados em SVG puro, sem nenhuma biblioteca de charts.',
                 'projects.archive.sofiaName': 'Sofia — IA de atendimento',
                 'projects.archive.sofiaMeta': 'JS · Tailwind · Acessibilidade',
@@ -1741,10 +2369,12 @@
                 'projects.archive.filmeName': 'Desafio Filme — Java',
                 'projects.archive.rpsMeta':   'Python · Lógica',
                 'projects.archive.jogoName':  'Jogo do Número Secreto',
+                'band.a':                     'Estágio · Júnior · Freelance · Estágio · Júnior · Freelance ·',
+                'band.b':                     'Disponível agora · Disponível agora · Disponível agora ·',
                 'contact.headline':           'Vamos<br><span class="ghost">construir</span><br>juntos?',
                 'contact.sub':                'Estágio, vaga júnior ou freelance — me chama. Eu respondo rápido e chego com código pronto para mostrar.',
                 'footer.copy':                '© 2026 Igor Grave Teixeira',
-                'footer.made':                'Feito do zero — HTML, CSS e JS puros, num único arquivo. <a href="https://github.com/graveigor/IgorGrave-portfolio" target="_blank" rel="noopener">Ver código ↗</a>',
+                'footer.made':                'Feito do zero — HTML, CSS e JS num único arquivo. <a href="https://github.com/graveigor/IgorGrave-portfolio" target="_blank" rel="noopener">Ver código ↗</a>',
             },
             en: {
                 'a11y.skip':                  'Skip to projects',
@@ -1753,18 +2383,19 @@
                 'nav.skills':                 'Skills',
                 'nav.projects':               'Projects',
                 'nav.contact':                'Contact',
-                'hero.tag':                   'Open to opportunities',
-                'hero.desc':                  'Fullstack developer: I build products end to end — interface, API, database and deployment. Live client websites, web and mobile applications, backend in Java and Node, and code built to last.',
-                'hero.cta':                   'View projects ↗',
-                'hero.info.roleLabel':        'Role',
-                'hero.info.roleValue':        'Fullstack / Backend Dev',
-                'hero.info.degreeLabel':      'Degree',
-                'hero.info.degreeValue':      'Software Eng. · FIAP',
-                'hero.info.locationLabel':    'Location',
-                'hero.info.locationValue':    'São Paulo, Brazil',
-                'hero.info.focusLabel':       'Current focus',
-                'hero.info.focusValue':       'APIs · Architecture · Cloud',
+                'hero.tag':                   'Open to internships & junior roles',
+                'hero.lead':                  'Fullstack developer. I build complete websites and systems — <em>and ship them.</em>',
+                'hero.desc':                  'From the interface to the API, database and deploy. I study Software Engineering at FIAP and have already delivered websites for real clients, plus web and mobile apps.',
+                'hero.cta':                   'View projects ↓',
+                'hero.cta2':                  'Get in touch',
+                'hero.proof':                 '<span>2 real clients</span><span>Web + mobile</span><span>Java · Node · TypeScript</span>',
+                'hero.showLabel':             'Live right now — click to open',
                 'hero.available':             '2 client sites in production',
+                'alt.cotseguro':              'Cotseguro website home page',
+                'alt.vet':                    'Vet Thata website home page',
+                'alt.family':                 'Family Finance app sign-in screen',
+                'alt.farma':                  'Pharmaceutical management system sign-in screen',
+                'alt.invest':                 'InvestStart prototype home screen',
                 'about.sideTag':              'About me',
                 'about.title':                'Less talk,<br><em>more shipping.</em>',
                 'about.p1':                   'I\'m Igor Grave Teixeira, a Software Engineering student at FIAP and a fullstack developer in São Paulo. While studying, I already deliver real software: institutional websites for real clients running in production, Java systems and interfaces that work on any screen.',
@@ -1777,6 +2408,7 @@
                 'about.fact.statusLabel':     'Status',
                 'about.fact.statusValue':     'Available ✓',
                 'skills.title':               'Tech stack.',
+                'skills.sub':                 'What I use day to day — and what I\'m learning right now.',
                 'skills.backend':             'Backend',
                 'skills.frontend':            'Frontend',
                 'skills.database':            'Databases',
@@ -1784,23 +2416,31 @@
                 'skills.responsive':          'Responsive design',
                 'skills.vercel':              'Vercel (deploys)',
                 'skills.docker':              'Docker (basics)',
-                'skills.radarLabel':          'On the radar →',
+                'skills.radarLabel':          'Learning now →',
                 'projects.title':             'Projects.',
                 'projects.sub':               'No mockups, no tutorials: public code with live deploys you can open right now.',
                 'projects.clientBadge':       'Real client',
                 'projects.liveBadge':         'Live',
                 'projects.viewSite':          'View site ↗',
                 'projects.viewCode':          'Code ↗',
+                'projects.cotseguro.tagline': 'The official website of a cargo insurance brokerage.',
                 'projects.cotseguro.desc':    'Complete institutional website for a cargo insurance brokerage: 4 pages, quote form, mobile menu and animations. Delivered, published and in use by the client.',
+                'projects.vet.tagline':       'Website for a home-visit veterinarian, with WhatsApp booking.',
                 'projects.vet.desc':          '6-page website for a veterinarian: services, product showcase and appointment booking integrated with WhatsApp and Google Calendar. Centralized JS config so the client updates everything in one place.',
                 'projects.vet.tagIntegration':'WhatsApp integration',
                 'projects.bank.name':         'Java Banking System',
+                'projects.bank.tagline':      'A bank account simulator that runs in the terminal.',
                 'projects.bank.desc':         'Console banking system: balance, deposits, transfers and business-rule validation. Focused on logic, control flow and clean code organization in Java.',
                 'projects.bank.tagLogic':     'Business rules',
+                'projects.bank.term':         '<span class="t-prompt">$</span> java DesafioBancario\n\n==========================\n  1 - Check balance\n  2 - Receive money\n  3 - Transfer money\n  4 - Exit\n==========================\n<span class="t-prompt">&gt;</span> 3\nAmount: 1500\n<span class="t-ok">Insufficient balance.</span> Operation cancelled.\n<span class="t-prompt">&gt;</span> <span class="t-caret"></span>',
                 'projects.family.name':       'Family Finance — Expense Tracker',
+                'projects.family.tagline':    'An app for families to track spending — in the browser or on the phone.',
                 'projects.family.desc':       'Fullstack monorepo app for tracking family expenses: a tested Fastify + Prisma + PostgreSQL API, an installable web app (PWA) and a native Android/iOS app in React Native. Every monetary value is an integer in cents — no float ever touches money.',
                 'projects.pharma.name':       'Pharmaceutical Distribution Management',
+                'projects.pharma.short':      'Pharma System',
+                'projects.pharma.tagline':    'A management system for pharmaceutical distributors.',
                 'projects.pharma.desc':       'Management platform for pharmaceutical distribution, with React 19 on the front and Express + tRPC on the back — end-to-end typing from database to screen. Industry Orders module fully working.',
+                'projects.invest.tagline':    'A prototype that shows, hands-on, why investing beats betting.',
                 'projects.invest.desc':       'Micro-investing prototype for the B3 case: gamified education, a simulator comparing betting against investing, and an assisted first investment. Charts drawn in pure SVG, with no charting library at all.',
                 'projects.archive.sofiaName': 'Sofia — customer service AI',
                 'projects.archive.sofiaMeta': 'JS · Tailwind · Accessibility',
@@ -1811,10 +2451,12 @@
                 'projects.archive.filmeName': 'Movie Challenge — Java',
                 'projects.archive.rpsMeta':   'Python · Logic',
                 'projects.archive.jogoName':  'Secret Number Game',
+                'band.a':                     'Internship · Junior · Freelance · Internship · Junior · Freelance ·',
+                'band.b':                     'Available now · Available now · Available now ·',
                 'contact.headline':           'Let\'s<br><span class="ghost">build</span><br>together?',
                 'contact.sub':                'Internship, junior role or freelance — reach out. I reply fast and show up with code ready to demo.',
                 'footer.copy':                '© 2026 Igor Grave Teixeira',
-                'footer.made':                'Built from scratch — pure HTML, CSS & JS in a single file. <a href="https://github.com/graveigor/IgorGrave-portfolio" target="_blank" rel="noopener">View source ↗</a>',
+                'footer.made':                'Built from scratch — HTML, CSS & JS in a single file. <a href="https://github.com/graveigor/IgorGrave-portfolio" target="_blank" rel="noopener">View source ↗</a>',
             }
         };
 
@@ -1831,6 +2473,12 @@
                 }
             });
 
+            /* textos alternativos das imagens */
+            document.querySelectorAll('[data-i18n-alt]').forEach(el => {
+                const text = TRANSLATIONS[lang][el.dataset.i18nAlt];
+                if (text !== undefined) el.alt = text;
+            });
+
             document.querySelectorAll('.lang-opt').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.lang === lang);
             });
@@ -1843,10 +2491,11 @@
             try { localStorage.setItem('lang', lang); } catch (e) { /* navegação privada */ }
 
             /* Fade-out rápido, troca, fade-in */
-            document.body.classList.add('lang-switching');
+            document.body.classList.add('lang-anim', 'lang-switching');
             setTimeout(() => {
                 applyLang(lang);
                 document.body.classList.remove('lang-switching');
+                setTimeout(() => document.body.classList.remove('lang-anim'), 200);
             }, 180);
         }
 
@@ -1865,22 +2514,252 @@
         })();
 
         /* ────────────────────────────────────────────
-           ANIMAÇÃO DE REVELAÇÃO (SCROLL)
+           MOVIMENTO: só anima se as libs carregaram
+           e a pessoa não pediu movimento reduzido
         ──────────────────────────────────────────── */
-        const revealElements = document.querySelectorAll('.reveal');
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const motionOn = !reduceMotion && !!(window.gsap && window.ScrollTrigger);
+        const finePointer = window.matchMedia('(pointer: fine)').matches;
 
-        const obs = new IntersectionObserver((entries, observer) => {
-            entries.forEach((entry, i) => {
-                if (entry.isIntersecting) {
-                    setTimeout(() => {
-                        entry.target.classList.add('in');
-                    }, i * 150);
-                    observer.unobserve(entry.target);
+        if (!motionOn) document.documentElement.classList.remove('js');
+
+        let lenis = null;
+
+        if (motionOn) {
+            try {
+                gsap.registerPlugin(ScrollTrigger);
+
+                /* Scroll suave */
+                if (window.Lenis) {
+                    lenis = new Lenis({ lerp: 0.1 });
+                    lenis.on('scroll', ScrollTrigger.update);
+                    gsap.ticker.add(time => lenis.raf(time * 1000));
+                    gsap.ticker.lagSmoothing(0);
                 }
-            });
-        }, { threshold: 0.15 });
 
-        revealElements.forEach(el => obs.observe(el));
+                /* Entrada do hero: nome sobe linha por linha, o resto vem atrás */
+                window.__introStarted = true;
+                const intro = gsap.timeline({ defaults: { ease: 'expo.out' } });
+                intro
+                    .to('.hero-name .line > span', { y: 0, duration: 1.3, stagger: 0.09 })
+                    .fromTo('.hero-intro', { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 1.1, stagger: 0.08 }, 0.35)
+                    .fromTo('.browser-view', { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', duration: 1.4, ease: 'expo.inOut' }, 0.45)
+                    .fromTo('.sticker', { scale: 0, rotate: -20 }, { scale: 1, rotate: 0, duration: 0.9, ease: 'back.out(2.2)' }, 1.3);
+
+                /* Barra de progresso de leitura */
+                gsap.to('.scroll-progress', {
+                    scaleX: 1,
+                    ease: 'none',
+                    scrollTrigger: { start: 0, end: 'max', scrub: true }
+                });
+
+                /* Títulos de seção: revelados de baixo para cima por uma "cortina" */
+                gsap.utils.toArray('.reveal-title').forEach(el => {
+                    gsap.fromTo(el,
+                        { clipPath: 'inset(0 0 100% 0)', y: 50 },
+                        {
+                            clipPath: 'inset(0 0 -10% 0)', y: 0, duration: 1.2, ease: 'expo.out',
+                            scrollTrigger: { trigger: el, start: 'top 88%' }
+                        });
+                });
+
+                /* Textos de apoio: sobem suavemente em grupo */
+                gsap.set('.fade', { opacity: 0, y: 30 });
+                ScrollTrigger.batch('.fade', {
+                    start: 'top 90%',
+                    once: true,
+                    onEnter: batch => gsap.fromTo(batch,
+                        { opacity: 0, y: 30 },
+                        { opacity: 1, y: 0, duration: 1, ease: 'expo.out', stagger: 0.1 })
+                });
+
+                /* Colunas de skills entram em sequência */
+                gsap.from('.skill-col', {
+                    opacity: 0, y: 40, duration: 1, ease: 'expo.out', stagger: 0.1,
+                    scrollTrigger: { trigger: '.skills-grid', start: 'top 85%' }
+                });
+
+                /* Projetos: a imagem abre como cortina lateral e o texto vem junto */
+                gsap.utils.toArray('.project-row').forEach(row => {
+                    const tl = gsap.timeline({
+                        defaults: { ease: 'expo.out' },
+                        scrollTrigger: { trigger: row, start: 'top 82%' }
+                    });
+                    tl.from(row.querySelector('.project-index'), { opacity: 0, x: -30, duration: 1 })
+                      .from(row.querySelectorAll('.project-body > *'), { opacity: 0, y: 24, duration: 1, stagger: 0.06 }, 0.05)
+                      .fromTo(row.querySelector('.project-thumb'),
+                          { clipPath: 'inset(0 100% 0 0)' },
+                          { clipPath: 'inset(0 0% 0 0)', duration: 1.3, ease: 'expo.inOut' }, 0);
+
+                    /* parallax leve no print dentro da moldura */
+                    const img = row.querySelector('.project-thumb img');
+                    if (img) {
+                        gsap.fromTo(img, { yPercent: -6 }, {
+                            yPercent: 0, ease: 'none',
+                            scrollTrigger: { trigger: row, start: 'top bottom', end: 'bottom top', scrub: true }
+                        });
+                    }
+                });
+
+                /* Arquivo: cards caem em cascata */
+                gsap.from('.archive-card', {
+                    opacity: 0, y: 30, duration: 0.9, ease: 'expo.out', stagger: 0.05,
+                    scrollTrigger: { trigger: '.archive-grid', start: 'top 88%' }
+                });
+
+                /* Números contam do zero */
+                gsap.utils.toArray('.count').forEach(el => {
+                    gsap.from(el, {
+                        textContent: 0, duration: 1.6, ease: 'power2.out', snap: { textContent: 1 },
+                        scrollTrigger: { trigger: el, start: 'top 90%' }
+                    });
+                });
+
+                /* Faixa gigante: as duas linhas andam em sentidos opostos com o scroll */
+                gsap.to('.band-row.outline', {
+                    xPercent: -20, ease: 'none',
+                    scrollTrigger: { trigger: '.band', start: 'top bottom', end: 'bottom top', scrub: true }
+                });
+                gsap.to('.band-row.solid', {
+                    xPercent: 15, ease: 'none',
+                    scrollTrigger: { trigger: '.band', start: 'top bottom', end: 'bottom top', scrub: true }
+                });
+
+                /* Link da nav acende conforme a seção visível */
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    const section = document.querySelector(link.getAttribute('href'));
+                    if (!section) return;
+                    ScrollTrigger.create({
+                        trigger: section,
+                        start: 'top center',
+                        end: 'bottom center',
+                        onToggle: self => link.classList.toggle('is-active', self.isActive)
+                    });
+                });
+
+                /* Botões "magnéticos": seguem o cursor de leve */
+                if (finePointer) {
+                    document.querySelectorAll('.magnetic').forEach(btn => {
+                        const xTo = gsap.quickTo(btn, 'x', { duration: 0.5, ease: 'power3.out' });
+                        const yTo = gsap.quickTo(btn, 'y', { duration: 0.5, ease: 'power3.out' });
+                        btn.addEventListener('pointermove', e => {
+                            const r = btn.getBoundingClientRect();
+                            xTo((e.clientX - r.left - r.width / 2) * 0.25);
+                            yTo((e.clientY - r.top - r.height / 2) * 0.35);
+                        });
+                        btn.addEventListener('pointerleave', () => { xTo(0); yTo(0); });
+                    });
+                }
+
+                /* recalcula posições depois que fontes e imagens carregam */
+                window.addEventListener('load', () => ScrollTrigger.refresh());
+            } catch (err) {
+                /* se algo der errado, mostra tudo sem animação */
+                console.error(err);
+                document.documentElement.classList.remove('js');
+                if (window.gsap) {
+                    ScrollTrigger.getAll().forEach(t => t.kill());
+                    gsap.set('.hero-name .line > span, .hero-intro, .browser-view, .fade, .skill-col, .project-body > *, .project-index, .project-thumb, .archive-card, .reveal-title', { clearProps: 'all' });
+                    document.querySelectorAll('.count').forEach(el => { el.textContent = el.dataset.to; });
+                }
+            }
+        }
+
+        /* Links internos usam o scroll suave do Lenis (menos o "pular para conteúdo") */
+        document.querySelectorAll('a[href^="#"]:not(.skip-link)').forEach(a => {
+            a.addEventListener('click', e => {
+                const target = document.querySelector(a.getAttribute('href'));
+                if (!target || !lenis) return;
+                e.preventDefault();
+                const href = a.getAttribute('href');
+                lenis.scrollTo(target, {
+                    offset: href === '#hero' ? -200 : -document.querySelector('nav').offsetHeight,
+                    duration: 1.4,
+                    onComplete: () => {
+                        target.focus({ preventScroll: true });
+                        history.pushState(null, '', href);
+                    }
+                });
+            });
+        });
+
+        /* ────────────────────────────────────────────
+           VITRINE DO HERO: troca os prints sozinha
+           (pausa no hover/foco; com movimento reduzido, só troca no clique)
+        ──────────────────────────────────────────── */
+        (function showcase() {
+            const root = document.getElementById('showcase');
+            if (!root) return;
+            const slides = [...root.querySelectorAll('.slide')];
+            const caps = [...root.querySelectorAll('.show-cap')];
+            const tabs = [...root.querySelectorAll('.show-tab')];
+            const url = root.querySelector('.browser-url');
+            const DURATION = 4.5;
+            let current = 0;
+            let timer = null;
+            let paused = false;
+
+            function go(n, animate = true) {
+                const prev = slides[current];
+                current = (n + slides.length) % slides.length;
+                const next = slides[current];
+
+                slides.forEach(s => {
+                    s.classList.toggle('is-active', s === next);
+                    s.classList.toggle('is-prev', s === prev && s !== next);
+                    s.inert = s !== next;
+                });
+                caps.forEach((c, i) => {
+                    c.classList.toggle('is-active', i === current);
+                    c.toggleAttribute('aria-hidden', i !== current);
+                });
+                tabs.forEach((t, i) => t.setAttribute('aria-current', i === current ? 'true' : 'false'));
+                url.textContent = next.dataset.url;
+
+                if (motionOn && animate && prev !== next) {
+                    gsap.fromTo(next, { clipPath: 'inset(0 0 0 100%)' }, { clipPath: 'inset(0 0 0 0%)', duration: 0.95, ease: 'expo.inOut' });
+                    gsap.fromTo(next.querySelector('img'), { scale: 1.15 }, { scale: 1, duration: 1.6, ease: 'expo.out' });
+                }
+                run();
+            }
+
+            function run() {
+                if (!motionOn) return;
+                if (timer) timer.kill();
+                tabs.forEach(t => gsap.set(t.querySelector('.fill'), { scaleX: 0 }));
+                timer = gsap.fromTo(tabs[current].querySelector('.fill'),
+                    { scaleX: 0 },
+                    { scaleX: 1, duration: DURATION, ease: 'none', onComplete: () => go(current + 1) });
+                if (paused) timer.pause();
+            }
+
+            let hovering = false;
+            let stopped = false;
+            const toggle = root.querySelector('.show-toggle');
+
+            /* pausa enquanto há mouse em cima, foco dentro ou a pessoa clicou em pausar */
+            function syncPause() {
+                paused = stopped || hovering || root.contains(document.activeElement);
+                if (timer) paused ? timer.pause() : timer.resume();
+            }
+
+            tabs.forEach((t, i) => t.addEventListener('click', () => go(i)));
+            root.addEventListener('pointerenter', () => { hovering = true; syncPause(); });
+            root.addEventListener('pointerleave', () => { hovering = false; syncPause(); });
+            root.addEventListener('focusin', syncPause);
+            root.addEventListener('focusout', () => setTimeout(syncPause, 0));
+            if (toggle) {
+                if (!motionOn) toggle.hidden = true;
+                toggle.addEventListener('click', () => {
+                    stopped = !stopped;
+                    toggle.setAttribute('aria-pressed', String(stopped));
+                    toggle.textContent = stopped ? '▶' : '❚❚';
+                    syncPause();
+                });
+            }
+
+            go(0, false);
+        })();
 
         /* ────────────────────────────────────────────
            MARQUEE: duplica o conteúdo até cobrir a tela
@@ -1920,6 +2799,14 @@
                 clearTimeout(resizeTimer);
                 resizeTimer = setTimeout(buildMarquee, 200);
             });
+
+            /* acelera a faixa conforme a velocidade do scroll */
+            if (lenis && track.getAnimations) {
+                lenis.on('scroll', ({ velocity }) => {
+                    const anim = track.getAnimations()[0];
+                    if (anim) anim.playbackRate = 1 + Math.min(Math.abs(velocity) * 0.25, 6);
+                });
+            }
         })();
 
         /* ────────────────────────────────────────────
@@ -1930,7 +2817,7 @@
             'font-size:20px;font-weight:bold;color:#ff3d00;'
         );
         console.log(
-            '%cEste site é HTML, CSS e JS puros — sem framework, num único arquivo.\nCódigo aberto: https://github.com/graveigor/IgorGrave-portfolio\nBora conversar? igorgraveteixeira@gmail.com',
+            '%cEste site é HTML, CSS e JS num único arquivo, com GSAP + Lenis nas animações.\nCódigo aberto: https://github.com/graveigor/IgorGrave-portfolio\nBora conversar? igorgraveteixeira@gmail.com',
             'font-size:13px;color:#0a0a0a;'
         );
     </script>
